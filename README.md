@@ -1,12 +1,11 @@
 # GoInsight
 
-![Static Badge](https://img.shields.io/badge/Python-v3.12.3-red?link=https%3A%2F%2Fwww.python.org%2Fdownloads%2Frelease%2Fpython-3123)
-![Static Badge](https://img.shields.io/badge/Partner-Tenuki-orange?link=https%3A%2F%2Ftenuki-brest.jeudego.org)
-![Static Badge](https://img.shields.io/badge/Partner-IMT_Atlantique-blue?link=https%3A%2F%2Fwww.imt-atlantique.fr%2Fen)
-![Static Badge](https://img.shields.io/badge/Website-KataGo-green?link=https%3A%2F%2Fkatagotraining.org)
-![Static Badge](https://img.shields.io/badge/Github-KataGo-black?link=https%3A%2F%2Fgithub.com%2Flightvector%2FKataGo)
-![Static Badge](https://img.shields.io/badge/License-MIT-yellow?link=https%3A%2F%2Fopensource.org%2Flicense%2FMIT)
-
+[![Python v3.12.3](https://img.shields.io/badge/Python-v3.12.3-red)](https://www.python.org/downloads/release/python-3123)
+[![Partner Tenuki](https://img.shields.io/badge/Partner-Tenuki-orange)](https://tenuki-brest.jeudego.org)
+[![Partner IMT Atlantique](https://img.shields.io/badge/Partner-IMT_Atlantique-blue)](https://www.imt-atlantique.fr/en)
+[![Website KataGo](https://img.shields.io/badge/Website-KataGo-green)](https://katagotraining.org)
+[![GitHub KataGo](https://img.shields.io/badge/Github-KataGo-black)](https://github.com/lightvector/KataGo)
+[![License MIT](https://img.shields.io/badge/License-MIT-yellow)](https://opensource.org/license/MIT)
 
 <table>
   <tr>
