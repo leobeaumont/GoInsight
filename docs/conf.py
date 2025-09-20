@@ -7,8 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'GoInsight'
-copyright = '2025, Beaumont Léo, Chambriard Léopold, Chouki Mouad, Disdier Jordan, Garrana Simon, Roubertou Amaury'
-author = 'Beaumont Léo, Chambriard Léopold, Chouki Mouad, Disdier Jordan, Garrana Simon, Roubertou Amaury'
+copyright = '2025, Beaumont Léo, Chambriard Léopold, Chouki Mouad, Disdier Jordan, Garrana Simon, Miranda-Gonzales Marcelo, Roubertou Amaury'
+author = 'Beaumont Léo, Chambriard Léopold, Chouki Mouad, Disdier Jordan, Garrana Simon, Miranda-Gonzales Marcelo, Roubertou Amaury'
 release = '1.0.0'
 
 # -- General configuration ---------------------------------------------------

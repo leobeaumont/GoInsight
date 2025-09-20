@@ -80,6 +80,7 @@ Contributions are not welcome yet, as this project is part of students cursus a 
 - Chouki Mouad (mouad.chouki@imt-atlantique.net)
 - Disdier Jordan (jordan.disdier@imt-atlantique.net)
 - Garrana Simon (simon.garrana@imt-atlantique.net)
+- Miranda-Gonzales Marcelo (marcelo.miranda-gonzales@imt-atlantique.net)
 - Roubertou Amaury (amaury.roubertou@imt-atlantique.net)
 
 ## Contacts
