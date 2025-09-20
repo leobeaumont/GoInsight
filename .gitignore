@@ -1,11 +1,31 @@
+# Byte-compiled / Python caches
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+
+# Editor / OS files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Test coverage
+htmlcov/
+.coverage
+
+# Pytest cache
+.pytest_cache/
+
+# Sphinx build files
+docs/_build/
+docs/generated/
+
+# Logs
+*.log
+
+# Optional: SQLite or other local databases
 *.db
 *.sqlite3
-.env
-.venv/
-.idea/
-.vscode/
-.DS_Store

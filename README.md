@@ -35,6 +35,10 @@ git clone https://github.com/leobeaumont/GoInsight.git
 cd GoInsight
 ```
 ```bash
+# (first use) Create environment
+python3 -m venv .venv
+```
+```bash
 # Open environment
 source .venv/bin/activate
 ```
