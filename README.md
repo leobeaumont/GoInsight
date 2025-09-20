@@ -33,16 +33,20 @@ This project is coded and tested under python version `3.12.3`. We cannot garant
 # Clone the repo
 git clone https://github.com/leobeaumont/GoInsight.git
 cd GoInsight
-
+```
+```bash
 # Open environment
 source .venv/bin/activate
-
+```
+```bash
 # Test python version (should be 3.12.3)
 python --version
-
+```
+```bash
 # Install dependencies
 pip install -r requirements.txt
-
+```
+```bash
 # (optional) Exit environment
 deactivate
 ```
