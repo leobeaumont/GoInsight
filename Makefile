@@ -24,7 +24,11 @@ setup:
 	@echo "Installing dependencies..."
 	$(VENV)/bin/pip install -r requirements.txt
 	@echo "Setup complete!"
-	@echo "Please run: source $(VENV)/bin/activate"
+	@echo "######################################"
+	@echo "# Please run:                        #"
+	@echo "#     source $(VENV)/bin/activate      #"
+	@echo "#                                    #"
+	@echo "######################################"
 
 clean:
 	rm -rf $(VENV)
