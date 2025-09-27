@@ -7,7 +7,6 @@ REQUIRED_PYTHON=3.12.3
 help:
 	@echo "Available targets:"
 	@echo "  make setup     - Check Python version, create venv, upgrade pip, install deps"
-	@echo "  make activate  - Show how to activate the venv"
 	@echo "  make clean     - Remove venv"
 
 setup:
