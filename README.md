@@ -35,25 +35,27 @@ git clone https://github.com/leobeaumont/GoInsight.git
 cd GoInsight
 ```
 ```bash
-# (first use) Create environment
-python3 -m venv .venv
+# Setup the environement
+make setup
 ```
 ```bash
 # Open environment
 source .venv/bin/activate
 ```
+You're all setup !
+
+## Commands
+
+### Documentation
 ```bash
-# Test python version (should be 3.12.3)
-python --version
+# This will open code's documentation on your default web browser
+make docs
 ```
+### Clean project
 ```bash
-# Install dependencies
-pip install -r requirements.txt
-```
-```bash
-# (optional) Exit environment
-deactivate
-```
+# Remove setup files from the project
+make clean
+``` 
 
 ## Contributing
 

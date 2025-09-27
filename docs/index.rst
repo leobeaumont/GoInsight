@@ -8,11 +8,6 @@ GoInsight documentation
 
 This page documents an example module.
 
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
 .. automodule:: codeExample
    :members:
    :undoc-members:
