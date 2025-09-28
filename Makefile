@@ -1,4 +1,4 @@
-.PHONY: help setup clean docs
+.PHONY: help setup clean docs get-model
 
 # Virtual environement
 VENV=.venv
@@ -12,11 +12,17 @@ BUILDDIR      = docs/_build
 HTMLDIR       = $(BUILDDIR)/html
 INDEXFILE     = $(HTMLDIR)/index.html
 
+# Katago model
+MODEL_DIR = models
+MODEL_FILE = $(MODEL_DIR)/katago.zip
+MODEL_URL = https://github.com/lightvector/KataGo/releases/download/v1.16.3/katago-v1.16.3-cuda12.1-cudnn8.9.7-linux-x64.zip
+
 help:
 	@echo "Available targets:"
 	@echo "  make setup     - Check Python version, create venv, upgrade pip, install deps, build docs"
 	@echo "  make docs      - Open docs"
-	@echo "  make clean     - Remove venv and docs"
+	@echo "  make get-model - Download model"
+	@echo "  make clean     - Remove venv, docs and models"
 
 setup:
 	@echo "Checking Python version..."
@@ -42,8 +48,8 @@ setup:
 	@echo "######################################"
 
 clean:
-	rm -rf $(VENV) $(BUILDDIR)
-	@echo "Removed virtual environment"
+	rm -rf $(VENV) $(BUILDDIR) $(MODEL_DIR)
+	@echo "Removed .venv, doc builds and models"
 
 docs:
 	@echo "Opening documentation..."
@@ -56,3 +62,9 @@ docs:
 	else \
 		echo "Please open $(INDEXFILE) manually."; \
 	fi
+
+get-model: $(MODEL_FILE)
+
+$(MODEL_FILE):
+	mkdir -p $(MODEL_DIR)
+	curl -L -o $(MODEL_FILE) $(MODEL_URL)

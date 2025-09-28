@@ -26,6 +26,8 @@ docs/generated/
 # Logs
 *.log
 
-# Optional: SQLite or other local databases
-*.db
-*.sqlite3
+# Models
+models/
+*.pt
+*.bin
+*.onnx
