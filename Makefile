@@ -24,7 +24,19 @@ help:
 	@echo "  make get-model - Download model"
 	@echo "  make clean     - Remove venv, docs and models"
 
-setup:
+setup: $(BUILDDIR)
+	@echo "Setup complete!"
+	@echo "######################################"
+	@echo "# Please run:                        #"
+	@echo "#     source $(VENV)/bin/activate      #"
+	@echo "#                                    #"
+	@echo "######################################"
+
+$(BUILDDIR): $(VENV)
+	@echo "Building documentation..."
+	$(VENV)/bin/$(SPHINXBUILD) -b html $(SOURCEDIR) $(HTMLDIR)
+
+$(VENV):
 	@echo "Checking Python version..."
 	@version=`$(PYTHON) --version 2>&1 | awk '{print $$2}'`; \
 	if [ "$$version" != "$(REQUIRED_PYTHON)" ]; then \
@@ -38,14 +50,6 @@ setup:
 	$(VENV)/bin/pip install --upgrade pip
 	@echo "Installing dependencies..."
 	$(VENV)/bin/pip install -r requirements.txt
-	@echo "Building documentation..."
-	$(VENV)/bin/$(SPHINXBUILD) -b html $(SOURCEDIR) $(HTMLDIR)
-	@echo "Setup complete!"
-	@echo "######################################"
-	@echo "# Please run:                        #"
-	@echo "#     source $(VENV)/bin/activate      #"
-	@echo "#                                    #"
-	@echo "######################################"
 
 clean:
 	rm -rf $(VENV) $(BUILDDIR) $(MODEL_DIR)
