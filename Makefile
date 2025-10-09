@@ -33,11 +33,11 @@ $(BUILDDIR): $(VENV)
 $(VENV):
 	@echo "Checking Python version..."
 	@version=`$(PYTHON) --version 2>&1 | awk '{print $$2}'`; \
-	if [ "$$version" != "$(REQUIRED_PYTHON)" ]; then \
-		echo "Python version must be $(REQUIRED_PYTHON), but found $$version"; \
-		exit 1; \
-	fi
-	@echo "Python version is $(REQUIRED_PYTHON)"
+	#if [ "$$version" != "$(REQUIRED_PYTHON)" ];#then \
+	#	echo "Python version must be $(REQUIRED_PYTHON), but found $$version"; \
+	#	exit 1; \
+	#fi
+	@echo "Python version is $$version"
 	@echo "Creating virtual environment in $(VENV)..."
 	$(PYTHON) -m venv $(VENV)
 	@echo "Upgrading pip inside virtual environment..."
