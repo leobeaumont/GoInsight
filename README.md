@@ -29,7 +29,7 @@
 
 This project is coded and tested under python version `3.12.3`. We cannot garantee the code to work on other python versions.
 
-First, open a terminal in the repository you'd like to clone the project in.
+First, open a terminal in the directory you'd like to clone the project in.
 
 ```bash
 # Clone the repo
