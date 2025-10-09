@@ -76,7 +76,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ### Documentation
 
-#### Unix(Linux/MacOS)
+#### Unix (Linux/MacOS)
 
 ```bash
 # This will open the project's documentation on your default web browser
@@ -92,7 +92,7 @@ make docs
 
 ### Clean project
 
-#### Unix(Linux/MacOS)
+#### Unix (Linux/MacOS)
 
 ```bash
 # Remove setup files and the virtual environment from the project
