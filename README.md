@@ -27,9 +27,11 @@
 
 ## Installation
 
+### Unix (Linux/MacOS)
+
 This project is coded and tested under python version `3.12.3`. We cannot garantee the code to work on other python versions.
 
-First, open a terminal in the directory you'd like to clone the project in.
+First, open a terminal in the directory you'd like to clone the project.
 
 ```bash
 # Clone the repo
@@ -41,23 +43,68 @@ cd GoInsight
 make setup
 ```
 ```bash
-# Open environment
+# Activate the virtual environment
 source .venv/bin/activate
 ```
 You're all setup !
 
+### Windows
+
+This project is coded and tested under Python version `3.12.3`. We cannot guarantee the code to work on other Python versions.
+
+First, open PowerShell in the directory where you'd like to clone the project.
+
+```powershell
+# Clone the repo
+git clone https://github.com/leobeaumont/GoInsight.git
+cd GoInsight
+```
+```powershell
+# Allow PowerShell scripts to run (first time only)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+```powershell
+# Setup the environment
+.\make.ps1 setup
+```
+```powershell
+# Activate the virtual environment
+.\.venv\Scripts\Activate.ps1
+```
+
 ## Commands
 
 ### Documentation
+
+#### Unix(Linux/MacOS)
+
 ```bash
-# This will open code's documentation on your default web browser
+# This will open the project's documentation on your default web browser
 make docs
 ```
+
+#### Windows
+
+```powershell
+# This will open the project's documentation in your default web browser
+.\make.ps1 docs
+```
+
 ### Clean project
+
+#### Unix(Linux/MacOS)
+
 ```bash
-# Remove setup files from the project
+# Remove setup files and the virtual environment from the project
 make clean
 ``` 
+
+#### Windows
+
+```powershell
+# Remove setup files and the virtual environment from the project
+.\make.ps1 clean
+```
 
 ## Contributing
 
