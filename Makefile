@@ -3,7 +3,6 @@
 # Virtual environement
 VENV=.venv
 PYTHON=python3
-REQUIRED_PYTHON=3.12.3
 
 # Documentation
 SPHINXBUILD   = sphinx-build
@@ -30,13 +29,6 @@ $(BUILDDIR): $(VENV)
 	@echo "Building documentation..."
 	$(VENV)/bin/$(SPHINXBUILD) -b html $(SOURCEDIR) $(HTMLDIR)
 
-#@echo "Checking Python version..."
-#@version=`$(PYTHON) --version 2>&1 | awk '{print $$2}'`;
-#if [ "$$version" != "$(REQUIRED_PYTHON)" ];#then \
-#	echo "Python version must be $(REQUIRED_PYTHON), but found $$version"; \
-#	exit 1; \
-#fi
-#@echo "Python version is $$version"
 $(VENV):
 	@echo "Creating virtual environment in $(VENV)..."
 	$(PYTHON) -m venv $(VENV)
@@ -51,9 +43,7 @@ clean:
 
 docs:
 	@echo "Opening documentation..."
-	@if [ "$$OS" = "Windows_NT" ]; then \
-		start $(INDEXFILE); \
-	elif command -v xdg-open > /dev/null; then \
+	@if command -v xdg-open > /dev/null; then \
 		xdg-open $(INDEXFILE); \
 	elif command -v open > /dev/null; then \
 		open $(INDEXFILE); \
