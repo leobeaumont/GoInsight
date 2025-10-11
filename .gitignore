@@ -25,9 +25,11 @@ docs/generated/
 
 # Logs
 *.log
+gtp_logs
 
 # Models
-models/
+model/
+neuralnet/
 *.pt
 *.bin
 *.onnx
