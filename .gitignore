@@ -25,7 +25,11 @@ docs/generated/
 
 # Logs
 *.log
+gtp_logs
 
-# Optional: SQLite or other local databases
-*.db
-*.sqlite3
+# Models
+model/
+neuralnet/
+*.pt
+*.bin
+*.onnx
