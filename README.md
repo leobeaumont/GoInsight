@@ -1,6 +1,5 @@
 # GoInsight
 
-[![Python v3.12.3](https://img.shields.io/badge/Python-v3.12.3-red)](https://www.python.org/downloads/release/python-3123)
 [![Partner Tenuki](https://img.shields.io/badge/Partner-Tenuki-orange)](https://tenuki-brest.jeudego.org)
 [![Partner IMT Atlantique](https://img.shields.io/badge/Partner-IMT_Atlantique-blue)](https://www.imt-atlantique.fr/en)
 [![Website KataGo](https://img.shields.io/badge/Website-KataGo-green)](https://katagotraining.org)
@@ -27,8 +26,6 @@
 
 ## Installation
 
-This project is coded and tested under python version `3.12.3`. We cannot garantee the code to work on other python versions.
-
 First, open a terminal in the directory you'd like to clone the project in.
 
 ```bash
@@ -44,9 +41,36 @@ make setup
 # Open environment
 source .venv/bin/activate
 ```
+```bash
+# Download KataGo model
+make get-model
+```
+
 You're all setup !
 
 ## Commands
+
+### Run KataGo in terminal
+```bash
+# This start an instance of KataGo, type gtp commands to interact with it
+# Use 'quit' command to close the instance
+# Use 'list_commands' to get a list of all th commands
+make run-model
+```
+
+### Optimise KataGo for your device (optional)
+```bash
+# Start a batch of tests to find the best parameters
+# /!\ runtime is very long (~30 mins)
+make opt-model
+```
+
+### Tests
+
+```bash
+# This will run all tests declared in the tests directory
+make tests
+```
 
 ### Documentation
 ```bash
@@ -57,7 +81,7 @@ make docs
 ```bash
 # Remove setup files from the project
 make clean
-``` 
+```
 
 ## Contributing
 

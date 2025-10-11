@@ -1,4 +1,4 @@
-.PHONY: help setup clean docs get-model opt-model
+.PHONY: help setup clean docs get-model opt-model run-model tests
 
 # Virtual environement
 VENV=.venv
@@ -25,8 +25,10 @@ help:
 	@echo "Available targets:"
 	@echo "  make setup     - Check Python version, create venv, upgrade pip, install deps, build docs"
 	@echo "  make docs      - Open docs"
+	@echo "  make tests     - Run tests"
 	@echo "  make get-model - Download model"
 	@echo "  make opt-model - Optimise model for your device (this command has a very long runtime ~30mins)"
+	@echo "  make run-model - Start a gtp session with the model"
 	@echo "  make clean     - Remove venv, docs, model and logs"
 
 setup: $(BUILDDIR)
@@ -88,3 +90,10 @@ $(BENCHMARK_OUT): $(MODEL_FILE) $(NEURALNET_FILE)
 	@echo "Starting benchmark procedure, this will take a while... (crtl + C to cancel)"
 	@sleep 5
 	$(MODEL_DIR)/katago benchmark -model $(NEURALNET_FILE) -config $(CONFIG_FILE) | tee $(MODEL_DIR)/benchmark_output.txt
+
+run-model: $(MODEL_FILE) $(NEURALNET_FILE)
+	@echo "Starting KataGo..."
+	$(MODEL_DIR)/katago gtp -model $(NEURALNET_FILE) -config $(CONFIG_FILE)
+
+tests:
+	$(VENV)/bin/python3 -m pytest -v
