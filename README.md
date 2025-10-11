@@ -54,7 +54,7 @@ You're all setup !
 ```bash
 # This start an instance of KataGo, type gtp commands to interact with it
 # Use 'quit' command to close the instance
-# Use 'list_commands' to get a list of all th commands
+# Use 'list_commands' to get a list of all the commands
 make run-model
 ```
 
