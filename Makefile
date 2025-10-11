@@ -80,7 +80,8 @@ $(NEURALNET_FILE):
 opt-model: $(BENCHMARK_OUT)
 	@echo "Benchmark done!"
 	@optimal_threads=$$(grep "(recommended)" $(BENCHMARK_OUT) | sed -E 's/.*numSearchThreads = *([0-9]+).*/\1/'); \
-	sed -i "332s/.*/numSearchThreads = $${optimal_threads}/" $(CONFIG_FILE); \
+	line_num=$$(grep -n "^numSearchThreads" $(CONFIG_FILE) | cut -d: -f1); \
+	sed -i "$${line_num}s/.*/numSearchThreads = $${optimal_threads}/" $(CONFIG_FILE); \
 	echo "Changed number of search threads to $${optimal_threads}, optimisation done!"
 	
 $(BENCHMARK_OUT): $(MODEL_FILE) $(NEURALNET_FILE)
