@@ -8,6 +8,9 @@ Modules:
     move -- handle manipulation and encoding of moves.
 """
 
+from typing import Tuple
+from .move import Move
+
 class Game:
     """
     Manages game's data with various tools.
@@ -37,6 +40,28 @@ class Game:
             FileNotFoundError: If the sgf file is not found.
         
         Returns:
-            (Game): the game provided in the sgf file.
+            (Game): The game provided in the sgf file.
+        """
+        pass
+
+    def next_color() -> str:
+        """
+        Tells if it is black's or white's turn.
+
+        Returns:
+            (str): 'b' for black and 'w' for white.
+        """
+        # Notes: by default black start the game
+        pass
+
+    def is_valid_pos(pos: Tuple[int, int]) -> bool:
+        """
+        Tells if a position is valid for a move.
+
+        Args:
+            pos (Tuple[int, int]): Position to test.
+
+        Returns:
+            (bool): Wether the position is playable or not.
         """
         pass
