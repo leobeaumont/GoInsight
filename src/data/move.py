@@ -9,7 +9,7 @@ Modules:
 """
 
 from typing import *
-from game import Game
+from .game import Game
 
 VALID_COLUMN = "ABCDEFGHJKLMNOPQRSTUVWXYZ"
 
