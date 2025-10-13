@@ -98,13 +98,8 @@ function Run-Tests {
 }
 
 function Show-Help {
-<<<<<<< HEAD
     Write-Host "Available commands:" -ForegroundColor Cyan
     Write-Host "  ./make.ps1 setup   - Create venv, install deps, build docs"
-=======
-    Write-Host "`nAvailable commands:" -ForegroundColor Cyan
-    Write-Host "  ./make.ps1 setup   - Check Python version, create venv, install deps, build docs"
->>>>>>> f9b608e4f2a261cc1e2de156fb47ece31ffec6b1
     Write-Host "  ./make.ps1 docs    - Open docs"
     Write-Host "  ./make.ps1 tests   - Run Python tests"
     Write-Host "  ./make.ps1 clean   - Remove venv and docs"
