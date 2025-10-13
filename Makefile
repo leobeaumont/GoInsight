@@ -14,6 +14,7 @@ INDEXFILE     = $(HTMLDIR)/index.html
 # Katago model
 MODEL_DIR = model
 MODEL_FILE = $(MODEL_DIR)/katago.zip
+# Find the right file for each OS at https://github.com/lightvector/KataGo/releases/download/v1.16.3
 MODEL_URL = https://github.com/lightvector/KataGo/releases/download/v1.16.3/katago-v1.16.3-eigen-linux-x64.zip
 NEURALNET_DIR = neuralnet
 NEURALNET_FILE = $(NEURALNET_DIR)/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz
