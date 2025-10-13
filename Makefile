@@ -24,7 +24,7 @@ OS := $(shell uname)
 
 help:
 	@echo "Available targets:"
-	@echo "  make setup     - Check Python version, create venv, upgrade pip, install deps, build docs"
+	@echo "  make setup     - Create venv, upgrade pip, install deps, build docs"
 	@echo "  make docs      - Open docs"
 	@echo "  make tests     - Run tests"
 	@echo "  make get-model - Download model"
@@ -62,9 +62,7 @@ clean:
 
 docs:
 	@echo "Opening documentation..."
-	@if [ "$$OS" = "Windows_NT" ]; then \
-		start $(INDEXFILE); \
-	elif command -v xdg-open > /dev/null; then \
+	@if command -v xdg-open > /dev/null; then \
 		xdg-open $(INDEXFILE); \
 	elif command -v open > /dev/null; then \
 		open $(INDEXFILE); \
