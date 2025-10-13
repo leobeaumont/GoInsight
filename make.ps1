@@ -8,11 +8,12 @@
     ./make.ps1 setup
     ./make.ps1 clean
     ./make.ps1 docs
+    ./make.ps1 tests
 #>
 
 param(
     [Parameter(Position=0)]
-    [ValidateSet("help", "setup", "clean", "docs")]
+    [ValidateSet("help", "setup", "clean", "docs", "tests")]
     [string]$Target = "help"
 )
 
@@ -74,10 +75,24 @@ function Clean {
     Write-Host "Cleanup complete."
 }
 
+function Run-Tests {
+    Write-Host "Running Python tests..." -ForegroundColor Cyan
+
+    $pythonExe = Join-Path $VENV "Scripts\python.exe"
+
+    if (-Not (Test-Path $pythonExe)) {
+        Write-Error "Python executable not found in virtual environment. Please run './make.ps1 setup' first."
+        exit 1
+    }
+
+    & $pythonExe -m pytest -v
+}
+
 function Show-Help {
     Write-Host "Available commands:" -ForegroundColor Cyan
-    Write-Host "  ./make.ps1 setup   - Check Python version, create venv, install deps, build docs"
+    Write-Host "  ./make.ps1 setup   - Create venv, install deps, build docs"
     Write-Host "  ./make.ps1 docs    - Open docs"
+    Write-Host "  ./make.ps1 tests   - Run Python tests"
     Write-Host "  ./make.ps1 clean   - Remove venv and docs"
     Write-Host "  ./make.ps1 help    - Show this help message"
 }
@@ -91,9 +106,10 @@ switch ($Target) {
         Write-Host "`nSetup complete!" -ForegroundColor Green
         Write-Host "######################################"
         Write-Host "# To activate your virtual env:      #"
-        Write-Host "#   .\$VENV\Scripts\Activate.ps1      #"
+        Write-Host "#   .\$VENV\Scripts\Activate.ps1     #"
         Write-Host "######################################"
     }
     "clean" { Clean }
     "docs"  { Open-Docs }
+    "tests" { Run-Tests }
 }

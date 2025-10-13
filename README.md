@@ -52,14 +52,12 @@ You're all setup !
 
 ### Windows
 
-This project is coded and tested under Python version `3.12.3`. We cannot guarantee the code to work on other Python versions.
-
 First, open PowerShell in the directory where you'd like to clone the project.
 
 ```powershell
 # Clone the repo
 git clone https://github.com/leobeaumont/GoInsight.git
-cd GoInsight
+cd ./GoInsight/
 ```
 ```powershell
 # Allow PowerShell scripts to run (first time only)
@@ -93,9 +91,18 @@ make opt-model
 
 ### Tests
 
+#### Unix (Linux/MacOS)
+
 ```bash
 # This will run all tests declared in the tests directory
 make tests
+```
+
+#### Windows
+
+```powershell
+# This will run all tests declared in the tests directory
+.\make.ps1 tests
 ```
 
 ### Documentation

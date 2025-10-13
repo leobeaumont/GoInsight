@@ -23,7 +23,7 @@ BENCHMARK_OUT = $(MODEL_DIR)/benchmark_output.txt
 
 help:
 	@echo "Available targets:"
-	@echo "  make setup     - Check Python version, create venv, upgrade pip, install deps, build docs"
+	@echo "  make setup     - Create venv, upgrade pip, install deps, build docs"
 	@echo "  make docs      - Open docs"
 	@echo "  make tests     - Run tests"
 	@echo "  make get-model - Download model"
