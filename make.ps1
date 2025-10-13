@@ -1,3 +1,4 @@
+#Requires -Version 5.1
 <#
 .SYNOPSIS
   PowerShell equivalent of Makefile tasks for Windows users.
@@ -28,19 +29,27 @@ $INDEXFILE = Join-Path $HTMLDIR "index.html"
 # --- Helper Functions ---
 
 function Create-Venv {
+    Write-Host "`nChecking Python installation..."
+    & $PYTHON --version
+
     if (-Not (Test-Path $VENV)) {
-        Write-Host "Creating virtual environment in $VENV..."
+        Write-Host "`nCreating virtual environment in $VENV..."
         & $PYTHON -m venv $VENV
     } else {
-        Write-Host "Virtual environment already exists."
+        Write-Host "`nVirtual environment already exists."
     }
 
     $pip = Join-Path $VENV "Scripts\pip.exe"
-    Write-Host "Upgrading pip..."
+    if (-Not (Test-Path $pip)) {
+        Write-Error "pip not found. Something went wrong with venv creation."
+        exit 1
+    }
+
+    Write-Host "`nUpgrading pip..."
     & $pip install --upgrade pip
 
     if (Test-Path "requirements.txt") {
-        Write-Host "Installing dependencies..."
+        Write-Host "`nInstalling dependencies..."
         & $pip install -r requirements.txt
     } else {
         Write-Warning "requirements.txt not found. Skipping dependency installation."
@@ -54,7 +63,7 @@ function Build-Docs {
         exit 1
     }
 
-    Write-Host "Building documentation..."
+    Write-Host "`nBuilding documentation..."
     & $sphinx -b html $SOURCEDIR $HTMLDIR
 }
 
@@ -68,14 +77,14 @@ function Open-Docs {
 }
 
 function Clean {
-    Write-Host "Removing virtual environment and build directory..."
+    Write-Host "`nRemoving virtual environment and build directory..."
     if (Test-Path $VENV) { Remove-Item -Recurse -Force $VENV }
     if (Test-Path $BUILDDIR) { Remove-Item -Recurse -Force $BUILDDIR }
     Write-Host "Cleanup complete."
 }
 
 function Show-Help {
-    Write-Host "Available commands:" -ForegroundColor Cyan
+    Write-Host "`nAvailable commands:" -ForegroundColor Cyan
     Write-Host "  ./make.ps1 setup   - Check Python version, create venv, install deps, build docs"
     Write-Host "  ./make.ps1 docs    - Open docs"
     Write-Host "  ./make.ps1 clean   - Remove venv and docs"
