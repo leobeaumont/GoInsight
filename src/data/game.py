@@ -4,8 +4,9 @@ game.py
 This module handles Go games import, manipulation and export.
 
 Modules:
-    game -- handle manipulation and encoding of games.
-    move -- handle manipulation and encoding of moves.
+    board -- handle manipulation and encoding of the board.
+    game  -- handle manipulation and encoding of games.
+    move  -- handle manipulation and encoding of moves.
 """
 
 from typing import Tuple

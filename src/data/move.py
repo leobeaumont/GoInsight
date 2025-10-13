@@ -4,14 +4,14 @@ move.py
 This module handles Go moves creation, manipulation and export.
 
 Modules:
+    board -- handle manipulation and encoding of the board.
     game -- handle manipulation and encoding of games.
     move -- handle manipulation and encoding of moves.
 """
 
 from typing import *
+from .constants import VALID_COLUMN
 from .game import Game
-
-VALID_COLUMN = "ABCDEFGHJKLMNOPQRSTUVWXYZ"
 
 class Move:
     """
