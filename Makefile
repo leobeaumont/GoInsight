@@ -83,14 +83,7 @@ $(MODEL_FILE):
 		if command -v brew >/dev/null 2>&1; then \
 			echo "Homebrew already installed."; \
 		else \
-			echo "Homebrew not found. Do you want to install it? (y/n)"; \
-			read ans; \
-			if [ "$$ans" = "y" ]; then \
-				echo "Installing Homebrew..."; \
-				/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
-			else \
-				echo "Homebrew not installed, you will need to install it manually to continue."; \
-			fi; \
+			echo "Homebrew not installed, you will need to install it manually to continue."; \
 		fi; \
 		echo "You are on macOS, installing KataGo via Homebrew..."; \
 		brew install katago; \
