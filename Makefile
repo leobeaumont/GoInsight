@@ -14,13 +14,13 @@ INDEXFILE     = $(HTMLDIR)/index.html
 # Katago model
 MODEL_DIR = model
 MODEL_FILE = $(MODEL_DIR)/katago.zip
-# Find the right file for each OS at https://github.com/lightvector/KataGo/releases/download/v1.16.3
 MODEL_URL = https://github.com/lightvector/KataGo/releases/download/v1.16.3/katago-v1.16.3-eigen-linux-x64.zip
 NEURALNET_DIR = neuralnet
 NEURALNET_FILE = $(NEURALNET_DIR)/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz
 NEURALNET_URL = https://media.katagotraining.org/uploaded/networks/models/kata1/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz
 CONFIG_FILE = $(MODEL_DIR)/default_gtp.cfg
 BENCHMARK_OUT = $(MODEL_DIR)/benchmark_output.txt
+OS := $(shell uname)
 
 help:
 	@echo "Available targets:"
@@ -55,6 +55,10 @@ $(VENV):
 clean:
 	rm -rf $(VENV) $(BUILDDIR) $(MODEL_DIR) $(NEURALNET_DIR) gtp_logs
 	@echo "Removed .venv, doc builds, model and logs"
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		echo "Uninstalling KataGo via Homebrew..."; \
+		brew uninstall katago; \
+	fi
 
 docs:
 	@echo "Opening documentation..."
@@ -69,13 +73,28 @@ docs:
 	fi
 
 get-model: $(MODEL_FILE) $(NEURALNET_FILE)
-	@echo "Model ready !"
+	@echo "Model ready !" 
 
 $(MODEL_FILE):
 	mkdir -p $(MODEL_DIR)
 	curl -L -o $(MODEL_FILE) $(MODEL_URL)
 	unzip -d $(MODEL_DIR) $(MODEL_FILE)
-
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		if command -v brew >/dev/null 2>&1; then \
+			echo "Homebrew already installed."; \
+		else \
+			echo "Homebrew not found. Do you want to install it? (y/n)"; \
+			read ans; \
+			if [ "$$ans" = "y" ]; then \
+				echo "Installing Homebrew..."; \
+				/bin/bash -c "$$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"; \
+			else \
+				echo "Homebrew not installed, you will need to install it manually to continue."; \
+			fi; \
+		fi; \
+		echo "You are on macOS, installing KataGo via Homebrew..."; \
+		brew install katago; \
+	fi
 $(NEURALNET_FILE):
 	mkdir -p $(NEURALNET_DIR)
 	curl -L -o $(NEURALNET_FILE) $(NEURALNET_URL)
@@ -94,7 +113,12 @@ $(BENCHMARK_OUT): $(MODEL_FILE) $(NEURALNET_FILE)
 
 run-model: $(MODEL_FILE) $(NEURALNET_FILE)
 	@echo "Starting KataGo..."
-	$(MODEL_DIR)/katago gtp -model $(NEURALNET_FILE) -config $(CONFIG_FILE)
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		katago gtp -model '$(NEURALNET_FILE)' -config '$(CONFIG_FILE)'; \
+	else \
+		$(MODEL_DIR)/katago gtp -model $(NEURALNET_FILE) -config $(CONFIG_FILE); \
+	fi
+	
 
 tests:
 	$(VENV)/bin/python3 -m pytest -v
