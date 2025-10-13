@@ -109,7 +109,12 @@ opt-model: $(BENCHMARK_OUT)
 $(BENCHMARK_OUT): $(MODEL_FILE) $(NEURALNET_FILE)
 	@echo "Starting benchmark procedure, this will take a while... (crtl + C to cancel)"
 	@sleep 5
-	$(MODEL_DIR)/katago benchmark -model $(NEURALNET_FILE) -config $(CONFIG_FILE) | tee $(MODEL_DIR)/benchmark_output.txt
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		katago benchmark -model $(NEURALNET_FILE) -config $(CONFIG_FILE) | tee $(MODEL_DIR)/benchmark_output.txt; \
+	else \
+		$(MODEL_DIR)/katago benchmark -model $(NEURALNET_FILE) -config $(CONFIG_FILE) | tee $(MODEL_DIR)/benchmark_output.txt; \
+	fi
+	
 
 run-model: $(MODEL_FILE) $(NEURALNET_FILE)
 	@echo "Starting KataGo..."
@@ -118,7 +123,6 @@ run-model: $(MODEL_FILE) $(NEURALNET_FILE)
 	else \
 		$(MODEL_DIR)/katago gtp -model $(NEURALNET_FILE) -config $(CONFIG_FILE); \
 	fi
-	
 
 tests:
 	$(VENV)/bin/python3 -m pytest -v
