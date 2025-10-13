@@ -95,6 +95,7 @@ $(MODEL_FILE):
 		echo "You are on macOS, installing KataGo via Homebrew..."; \
 		brew install katago; \
 	fi
+
 $(NEURALNET_FILE):
 	mkdir -p $(NEURALNET_DIR)
 	curl -L -o $(NEURALNET_FILE) $(NEURALNET_URL)
@@ -114,7 +115,6 @@ $(BENCHMARK_OUT): $(MODEL_FILE) $(NEURALNET_FILE)
 	else \
 		$(MODEL_DIR)/katago benchmark -model $(NEURALNET_FILE) -config $(CONFIG_FILE) | tee $(MODEL_DIR)/benchmark_output.txt; \
 	fi
-	
 
 run-model: $(MODEL_FILE) $(NEURALNET_FILE)
 	@echo "Starting KataGo..."
