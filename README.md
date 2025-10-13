@@ -26,6 +26,8 @@
 
 ## Installation
 
+### Unix (Linux/MacOS)
+
 First, open a terminal in the directory you'd like to clone the project in.
 
 ```bash
@@ -38,7 +40,7 @@ cd GoInsight
 make setup
 ```
 ```bash
-# Open environment
+# Activate the virtual environment
 source .venv/bin/activate
 ```
 ```bash
@@ -47,6 +49,28 @@ make get-model
 ```
 
 You're all setup !
+
+### Windows
+
+First, open PowerShell in the directory where you'd like to clone the project.
+
+```powershell
+# Clone the repo
+git clone https://github.com/leobeaumont/GoInsight.git
+cd ./GoInsight/
+```
+```powershell
+# Allow PowerShell scripts to run (first time only)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+```powershell
+# Setup the environment
+.\make.ps1 setup
+```
+```powershell
+# Activate the virtual environment
+.\.venv\Scripts\Activate.ps1
+```
 
 ## Commands
 
@@ -67,20 +91,50 @@ make opt-model
 
 ### Tests
 
+#### Unix (Linux/MacOS)
+
 ```bash
 # This will run all tests declared in the tests directory
 make tests
 ```
 
+#### Windows
+
+```powershell
+# This will run all tests declared in the tests directory
+.\make.ps1 tests
+```
+
 ### Documentation
+
+#### Unix (Linux/MacOS)
+
 ```bash
-# This will open code's documentation on your default web browser
+# This will open the project's documentation on your default web browser
 make docs
 ```
+
+#### Windows
+
+```powershell
+# This will open the project's documentation in your default web browser
+.\make.ps1 docs
+```
+
 ### Clean project
+
+#### Unix (Linux/MacOS)
+
 ```bash
-# Remove setup files from the project
+# Remove setup files and the virtual environment from the project
 make clean
+```
+
+#### Windows
+
+```powershell
+# Remove setup files and the virtual environment from the project
+.\make.ps1 clean
 ```
 
 ## Contributing
