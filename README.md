@@ -114,15 +114,15 @@ make opt-model
 
 #### Unix (Linux/MacOS)
 
+This will run all tests declared in the tests directory
+
 ```bash
-# This will run all tests declared in the tests directory
 make tests
 ```
 
 #### Windows
 
 ```powershell
-# This will run all tests declared in the tests directory
 .\make.ps1 tests
 ```
 
