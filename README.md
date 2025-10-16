@@ -73,43 +73,41 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 ```Powershell
 # Download KataGo model
-# Downloads the KataGo Windows binary (katago.exe) and the neural network (.bin.gz)
 .\make.ps1 get-model
 ```
 
 ## Commands
 
 ### Run KataGo in terminal
+
+This start an instance of KataGo, type gtp commands to interact with it.
+- Use `quit` command to close the instance
+- Use `list_commands` to get a list of all the commands
+
 #### Unix (Linux/MacOs)
+
 ```bash
-# This start an instance of KataGo, type gtp commands to interact with it
-# Use 'quit' command to close the instance
-# Use 'list_commands' to get a list of all th commands
 make run-model
 ```
 #### Windows
-```Powershell
-# Start an instance of KataGo (GTP mode)
-# Type GTP commands in the terminal
-# Use 'list_commands' to see all available commands
-# Type 'quit' to close the instance
-.\make.ps1 run-model
 
+```Powershell
+.\make.ps1 run-model
 ```
 
 ### Optimise KataGo for your device (optional)
+
+Start a batch of tests to find the best parameters (/!\ runtime is very long: ~30 mins)
+
 #### Unix (Linux/MacOS)
+
 ```bash
-# Start a batch of tests to find the best parameters
-# /!\ runtime is very long (~30 mins)
 make opt-model
 ```
 #### Windows
-```Powershell
-# Start a batch of tests to find the best parameters
-# Runs the benchmark (~30 min) and updates 'default_gtp.cfg'
-.\make.ps1 opt-model
 
+```Powershell
+.\make.ps1 opt-model
 ```
 
 ### Tests
@@ -132,15 +130,15 @@ make tests
 
 #### Unix (Linux/MacOS)
 
+This will open the project's documentation on your default web browser
+
 ```bash
-# This will open the project's documentation on your default web browser
 make docs
 ```
 
 #### Windows
 
 ```powershell
-# This will open the project's documentation in your default web browser
 .\make.ps1 docs
 ```
 
@@ -148,15 +146,15 @@ make docs
 
 #### Unix (Linux/MacOS)
 
+Remove setup files and the virtual environment from the project
+
 ```bash
-# Remove setup files and the virtual environment from the project
 make clean
 ```
 
 #### Windows
 
 ```powershell
-# Remove setup files and the virtual environment from the project
 .\make.ps1 clean
 ```
 
