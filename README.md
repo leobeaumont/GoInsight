@@ -71,22 +71,45 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 # Activate the virtual environment
 .\.venv\Scripts\Activate.ps1
 ```
+```Powershell
+# Download KataGo model
+# Télécharge le binaire KataGo Windows (katago.exe) et le réseau neuronal (.bin.gz)
+.\make.ps1 get-model
+```
 
 ## Commands
 
 ### Run KataGo in terminal
+#### Unix (Linux/MacOs)
 ```bash
 # This start an instance of KataGo, type gtp commands to interact with it
 # Use 'quit' command to close the instance
 # Use 'list_commands' to get a list of all th commands
 make run-model
 ```
+#### Windows
+```Powershell
+# Start an instance of KataGo (GTP mode)
+# Tapez des commandes GTP dans le terminal
+# Utilisez 'list_commands' pour voir toutes les commandes disponibles
+# Tapez 'quit' pour fermer l'instance
+.\make.ps1 run-model
+
+```
 
 ### Optimise KataGo for your device (optional)
+#### Unix (Linux/MacOS)
 ```bash
 # Start a batch of tests to find the best parameters
 # /!\ runtime is very long (~30 mins)
 make opt-model
+```
+#### Windows
+```Powershell
+# Start a batch of tests to find the best parameters
+# Lance le benchmark (~30 min) et met à jour 'default_gtp.cfg'
+.\make.ps1 opt-model
+
 ```
 
 ### Tests
