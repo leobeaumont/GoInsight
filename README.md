@@ -73,7 +73,7 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 ```Powershell
 # Download KataGo model
-# Télécharge le binaire KataGo Windows (katago.exe) et le réseau neuronal (.bin.gz)
+# Downloads the KataGo Windows binary (katago.exe) and the neural network (.bin.gz)
 .\make.ps1 get-model
 ```
 
@@ -90,9 +90,9 @@ make run-model
 #### Windows
 ```Powershell
 # Start an instance of KataGo (GTP mode)
-# Tapez des commandes GTP dans le terminal
-# Utilisez 'list_commands' pour voir toutes les commandes disponibles
-# Tapez 'quit' pour fermer l'instance
+# Type GTP commands in the terminal
+# Use 'list_commands' to see all available commands
+# Type 'quit' to close the instance
 .\make.ps1 run-model
 
 ```
@@ -107,7 +107,7 @@ make opt-model
 #### Windows
 ```Powershell
 # Start a batch of tests to find the best parameters
-# Lance le benchmark (~30 min) et met à jour 'default_gtp.cfg'
+# Runs the benchmark (~30 min) and updates 'default_gtp.cfg'
 .\make.ps1 opt-model
 
 ```
