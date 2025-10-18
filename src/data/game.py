@@ -7,6 +7,7 @@ Modules:
     board -- handle manipulation and encoding of the board.
     game  -- handle manipulation and encoding of games.
     move  -- handle manipulation and encoding of moves.
+    sgf   -- handle SGF parsing.
 """
 
 from typing import Tuple

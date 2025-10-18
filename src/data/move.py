@@ -5,8 +5,9 @@ This module handles Go moves creation, manipulation and export.
 
 Modules:
     board -- handle manipulation and encoding of the board.
-    game -- handle manipulation and encoding of games.
-    move -- handle manipulation and encoding of moves.
+    game  -- handle manipulation and encoding of games.
+    move  -- handle manipulation and encoding of moves.
+    sgf   -- handle SGF parsing.
 """
 
 from typing import *
