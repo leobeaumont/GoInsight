@@ -1,8 +1,9 @@
-.PHONY: help setup clean docs get-model opt-model run-model tests
+.PHONY: help setup clean docs get-model opt-model run-model tests check-python
 
 # Virtual environement
 VENV=.venv
 PYTHON=python3
+MIN_PYTHON_VERSION=3.7
 
 # Documentation
 SPHINXBUILD   = sphinx-build
@@ -24,7 +25,7 @@ OS := $(shell uname)
 
 help:
 	@echo "Available targets:"
-	@echo "  make setup     - Create venv, upgrade pip, install deps, build docs"
+	@echo "  make setup     - Check python version, create venv, upgrade pip, install deps, build docs"
 	@echo "  make docs      - Open docs"
 	@echo "  make tests     - Run tests"
 	@echo "  make get-model - Download model"
@@ -32,7 +33,7 @@ help:
 	@echo "  make run-model - Start a gtp session with the model"
 	@echo "  make clean     - Remove venv, docs, model and logs"
 
-setup: $(BUILDDIR)
+setup:  $(BUILDDIR)
 	@echo "Setup complete!"
 	@echo "######################################"
 	@echo "# Please run:                        #"
@@ -40,11 +41,25 @@ setup: $(BUILDDIR)
 	@echo "#                                    #"
 	@echo "######################################"
 
+check-python:
+	@echo "Checking python version ..."; \
+	PYTHON_VERSION=$$($(PYTHON) -c 'import sys; print(".".join(map(str, sys.version_info[:3])))'); \
+	echo "Python version: $$PYTHON_VERSION"; \
+	REQUIRED=$(MIN_PYTHON_VERSION); \
+	CURRENT_MAJOR=$$(echo $$PYTHON_VERSION | cut -d. -f1); \
+	CURRENT_MINOR=$$(echo $$PYTHON_VERSION | cut -d. -f2); \
+	REQUIRED_MAJOR=$$(echo $$REQUIRED | cut -d. -f1); \
+	REQUIRED_MINOR=$$(echo $$REQUIRED | cut -d. -f2); \
+	if [ $$CURRENT_MAJOR -lt $$REQUIRED_MAJOR ] || ([ $$CURRENT_MAJOR -eq $$REQUIRED_MAJOR ] && [ $$CURRENT_MINOR -lt $$REQUIRED_MINOR ]); then \
+		echo "Python $$REQUIRED or higher is required. Found $$PYTHON_VERSION."; \
+		exit 1; \
+	fi
+
 $(BUILDDIR): $(VENV)
 	@echo "Building documentation..."
 	$(VENV)/bin/$(SPHINXBUILD) -b html $(SOURCEDIR) $(HTMLDIR)
 
-$(VENV):
+$(VENV): check-python
 	@echo "Creating virtual environment in $(VENV)..."
 	$(PYTHON) -m venv $(VENV)
 	@echo "Upgrading pip inside virtual environment..."
