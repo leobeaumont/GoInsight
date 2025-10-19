@@ -98,6 +98,10 @@ class SgfTree:
 
         return parse(sgf_data)
     
+    @classmethod
+    def from_game(cls, game: "Game") -> "SgfTree":
+        pass
+    
     def to_sgf(self, path: Optional[str] = None) -> str:
         """Convert this SgfTree into a full SGF string and optionally save it to a file.
 

@@ -37,7 +37,7 @@ class Move:
 
     def __init__(
         self,
-        game: "Game", # pyright: ignore[reportUndefinedVariable]
+        game: "Game",
         color: Optional[str] = None,
         pos: Optional[Tuple[int, int]] = None
     ):
