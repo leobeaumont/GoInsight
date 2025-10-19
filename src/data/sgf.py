@@ -11,6 +11,7 @@ Modules:
 """
 
 import os
+from typing import Dict, List, Optional
 
 class SgfTree:
     """Represents a node in an SGF (Smart Game Format) tree.
@@ -22,7 +23,11 @@ class SgfTree:
         children (list[SgfTree]): A list of child SgfTree nodes.
     """
 
-    def __init__(self, properties=None, children=None):
+    def __init__(
+        self,
+        properties: Dict[str, List[str]] = None,
+        children: Optional[List["SgfTree"]] = None
+    ):
         """Initialize a new SgfTree instance.
 
         Args:
@@ -32,7 +37,7 @@ class SgfTree:
         self.properties = properties or {}
         self.children = children or []
 
-    def __eq__(self, other):
+    def __eq__(self, other: "SgfTree") -> bool:
         """Compare two SgfTree instances for equality.
 
         Args:
@@ -58,7 +63,7 @@ class SgfTree:
                 return False
         return True
 
-    def __ne__(self, other):
+    def __ne__(self, other: "SgfTree") -> bool:
         """Check if two SgfTree instances are not equal.
 
         Args:
@@ -92,7 +97,26 @@ class SgfTree:
             sgf_data = file.read()
 
         return parse(sgf_data)
+    
+    def to_sgf(self, path: Optional[str] = None) -> str:
+        """Convert this SgfTree into a full SGF string and optionally save it to a file.
 
+        Args:
+            path (str, optional): If provided, the SGF output will be written to this file path.
+
+        Returns:
+            str: The SGF-formatted string representation of this tree.
+
+        Raises:
+            OSError: If writing to the file fails.
+        """
+        sgf_string = f"({serialize(self)})"
+
+        if path:
+            with open(path, "w", encoding="utf-8") as file:
+                file.write(sgf_string)
+
+        return sgf_string
 
 
 def parse(input):
@@ -181,3 +205,37 @@ def parse(input):
     if not input.startswith('('):
         raise ValueError('tree missing')
     return get_node()
+
+def serialize(tree: "SgfTree") -> str:
+    """Serialize an SgfTree instance into an SGF-formatted string.
+
+    This function recursively converts an SgfTree and its children into a valid
+    SGF representation, escaping special characters as required by the SGF specification.
+
+    Args:
+        tree (SgfTree): The SgfTree instance to serialize.
+
+    Returns:
+        str: A valid SGF-formatted string representing the tree.
+    """
+
+    def escape_value(value: str) -> str:
+        """Escape SGF special characters inside property values."""
+        return value.replace("\\", "\\\\").replace("]", "\\]")
+
+    def serialize_node(node: "SgfTree") -> str:
+        """Serialize a single SGF node (without children)."""
+        out = ";"
+        for key, values in node.properties.items():
+            escaped_values = [escape_value(v) for v in values]
+            out += f"{key}[{']['.join(escaped_values)}]"
+        return out
+
+    output = serialize_node(tree)
+
+    if not tree.children:
+        return output
+    elif len(tree.children) == 1:
+        return output + serialize(tree.children[0])
+    else:
+        return output + "".join(f"({serialize(child)})" for child in tree.children)    

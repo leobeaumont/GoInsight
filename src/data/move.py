@@ -12,7 +12,6 @@ Modules:
 
 from typing import *
 from .constants import VALID_COLUMN
-from .game import Game
 
 class Move:
     """
@@ -38,7 +37,7 @@ class Move:
 
     def __init__(
         self,
-        game: Game,
+        game: "Game", # pyright: ignore[reportUndefinedVariable]
         color: Optional[str] = None,
         pos: Optional[Tuple[int, int]] = None
     ):
