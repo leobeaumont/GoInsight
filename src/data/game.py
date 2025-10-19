@@ -12,6 +12,7 @@ Modules:
 
 from typing import Tuple
 from .move import Move
+from .sgf import SgfTree
 
 class Game:
     """
@@ -31,20 +32,17 @@ class Game:
         pass
     
     @classmethod
-    def from_sgf(cls, path: str) -> "Game":
+    def from_sgftree(cls, tree: SgfTree) -> "Game":
         """
-        Create a new Game object from an sgf file.
+        Create a new Game object from an sgf tree.
 
         Args:
-            path (str): Path to the sgf file.
-
-        Raises:
-            FileNotFoundError: If the sgf file is not found.
+            tree (SgfTree): SgfTree of the game.
         
         Returns:
-            (Game): The game provided in the sgf file.
+            (Game): The game provided in the sgf tree.
         """
-        pass
+        return tree.to_game()
 
     def next_color() -> str:
         """

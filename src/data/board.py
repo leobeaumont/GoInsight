@@ -10,9 +10,11 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import *
+from typing import Optional, Tuple, TYPE_CHECKING
 from .constants import VALID_COLUMN
-from .game import Game
+
+if TYPE_CHECKING:
+    from .game import Game
 
 class Board:
     """
@@ -35,7 +37,7 @@ class Board:
 
     def __init__(
         self,
-        game: Game,
+        game: "Game",
         size: Optional[Tuple[int, int]] = (19, 19)
     ):
         self.game = game

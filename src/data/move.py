@@ -10,8 +10,11 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import *
+from typing import Optional, Tuple, TYPE_CHECKING
 from .constants import VALID_COLUMN
+
+if TYPE_CHECKING:
+    from .game import Game
 
 class Move:
     """

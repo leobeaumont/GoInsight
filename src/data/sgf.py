@@ -11,7 +11,10 @@ Modules:
 """
 
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .game import Game
 
 class SgfTree:
     """Represents a node in an SGF (Smart Game Format) tree.
@@ -100,7 +103,11 @@ class SgfTree:
     
     @classmethod
     def from_game(cls, game: "Game") -> "SgfTree":
-        pass
+        return game.to_sgftree()
+
+    def to_game(self) -> "Game":
+        from .game import Game
+        return Game.from_sgftree(self)
     
     def to_sgf(self, path: Optional[str] = None) -> str:
         """Convert this SgfTree into a full SGF string and optionally save it to a file.
