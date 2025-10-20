@@ -4,19 +4,27 @@ game.py
 This module handles Go games import, manipulation and export.
 
 Modules:
-    game -- handle manipulation and encoding of games.
-    move -- handle manipulation and encoding of moves.
+    board -- handle manipulation and encoding of the board.
+    game  -- handle manipulation and encoding of games.
+    move  -- handle manipulation and encoding of moves.
+    sgf   -- handle SGF parsing.
 """
 
-from typing import Tuple
+from typing import List, Optional, Tuple, Union
 from .move import Move
+from .sgf import SgfTree
 
 class Game:
     """
     Manages game's data with various tools.
 
     Args:
-        argname (argtype): Description of the arg. 
+        RU (List[str]): Ruleset (e.g.: Japanese). 
+        SZ (List[str]): Size of the board, non-square boards are supported. 
+        KM (List[str]): Komi. 
+        HA (List[str], optional): Number of handicap stones given to Black. Placement of the handicap stones are set using the AB property. 
+        AB (List[str], optional): Locations of Black stones to be placed on the board prior to the first move. 
+        AW (List[str], optional): Locations of White stones to be placed on the board prior to the first move. 
 
     Attributes:
         attrname (attrtype): Attribut description.
@@ -25,26 +33,48 @@ class Game:
         from_sgf(path): Create a Game object from an sgf file.
     """
 
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        RU: List[str],
+        SZ: List[str],
+        KM: List[str],
+        HA: Optional[List[str]] = ["0"],
+        AB: Optional[List[str]] = None,
+        AW: Optional[List[str]] = None,
+        **kwargs
+    ):
+        self.ruleset: str = RU[0]
+         
+        size = [int(txt) for txt in SZ[0].split(":")]
+        if len(size) == 1:
+            size *= 2
+        self.size: Tuple[int, int] = size
+
+        self.komi: float = float(KM[0])
+
+        self.handicap: int = int(HA[0])
+
+        if AB:
+            self.place("black", [Move.gtp_to_coord(gtp_pos) for gtp_pos in AB])
+        
+        if AW:
+            self.place("white", [Move.gtp_to_coord(gtp_pos) for gtp_pos in AW])
     
     @classmethod
-    def from_sgf(cls, path: str) -> "Game":
+    def from_sgftree(cls, tree: SgfTree) -> "Game":
         """
-        Create a new Game object from an sgf file.
+        Create a new Game object from an sgf tree.
 
         Args:
-            path (str): Path to the sgf file.
-
-        Raises:
-            FileNotFoundError: If the sgf file is not found.
+            tree (SgfTree): SgfTree of the game.
         
         Returns:
-            (Game): The game provided in the sgf file.
+            (Game): The game provided in the sgf tree.
         """
-        pass
+        root_properties = tree.properties
+        game = Game(**root_properties)
 
-    def next_color() -> str:
+    def next_color(self) -> str:
         """
         Tells if it is black's or white's turn.
 
@@ -52,9 +82,10 @@ class Game:
             (str): 'b' for black and 'w' for white.
         """
         # Notes: by default black start the game
+        # If black has bonus stones to handicap white, white start the game. Except if black has only one bonus stone, then black starts the game.
         pass
 
-    def is_valid_pos(pos: Tuple[int, int]) -> bool:
+    def is_valid_pos(self, pos: Tuple[int, int]) -> bool:
         """
         Tells if a position is valid for a move.
 
@@ -64,4 +95,35 @@ class Game:
         Returns:
             (bool): Wether the position is playable or not.
         """
+        pass
+    
+    @overload
+    def place(self, color: str, pos: Tuple[int, int]):
+        """
+        Place a stone with the chosen color and coordinates.
+
+        Args:
+            color (str): Color of the stone.
+            pos (Tuple[int, int]): Coordinates of the stone.
+
+        Raises:
+            ValueError: If the coordinates is invalid.
+        """
+        ...
+
+    @overload
+    def place(self, color: str, pos: List[Tuple[int, int]]):
+        """
+        Place stones with the chosen color and coordinates.
+
+        Args:
+            color (str): Color of the stone.
+            pos (List[Tuple[int, int]]): List of coordinates of the stones.
+
+        Raises:
+            ValueError: If one of the coordinates is invalid.
+        """
+        ...
+    
+    def place(self, color: str, pos: Union[Tuple[int, int], List[Tuple[int, int]]]):
         pass

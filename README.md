@@ -26,6 +26,10 @@
 
 ## Installation
 
+This project requires Python `3.7` or higher. Please ensure Python `3.7+` is installed and available on your `PATH` before running the setup.
+
+### Unix (Linux/MacOS)
+
 First, open a terminal in the directory you'd like to clone the project in.
 
 ```bash
@@ -38,7 +42,7 @@ cd GoInsight
 make setup
 ```
 ```bash
-# Open environment
+# Activate the virtual environment
 source .venv/bin/activate
 ```
 ```bash
@@ -48,39 +52,112 @@ make get-model
 
 You're all setup !
 
+### Windows
+
+First, open PowerShell in the directory where you'd like to clone the project.
+
+```powershell
+# Clone the repo
+git clone https://github.com/leobeaumont/GoInsight.git
+cd ./GoInsight/
+```
+```powershell
+# Allow PowerShell scripts to run (first time only)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+```powershell
+# Setup the environment
+.\make.ps1 setup
+```
+```powershell
+# Activate the virtual environment
+.\.venv\Scripts\Activate.ps1
+```
+```Powershell
+# Download KataGo model
+.\make.ps1 get-model
+```
+
 ## Commands
 
 ### Run KataGo in terminal
+
+This start an instance of KataGo, type gtp commands to interact with it.
+- Use `quit` command to close the instance
+- Use `list_commands` to get a list of all the commands
+
+#### Unix (Linux/MacOs)
+
 ```bash
-# This start an instance of KataGo, type gtp commands to interact with it
-# Use 'quit' command to close the instance
-# Use 'list_commands' to get a list of all the commands
 make run-model
+```
+#### Windows
+
+```Powershell
+.\make.ps1 run-model
 ```
 
 ### Optimise KataGo for your device (optional)
+
+Start a batch of tests to find the best parameters (/!\ runtime is very long: ~30 mins)
+
+#### Unix (Linux/MacOS)
+
 ```bash
-# Start a batch of tests to find the best parameters
-# /!\ runtime is very long (~30 mins)
 make opt-model
+```
+#### Windows
+
+```Powershell
+.\make.ps1 opt-model
 ```
 
 ### Tests
 
+#### Unix (Linux/MacOS)
+
+This will run all tests declared in the tests directory
+
 ```bash
-# This will run all tests declared in the tests directory
 make tests
 ```
 
+#### Windows
+
+```powershell
+.\make.ps1 tests
+```
+
 ### Documentation
+
+#### Unix (Linux/MacOS)
+
+This will open the project's documentation on your default web browser
+
 ```bash
-# This will open code's documentation on your default web browser
 make docs
 ```
+
+#### Windows
+
+```powershell
+.\make.ps1 docs
+```
+
 ### Clean project
+
+#### Unix (Linux/MacOS)
+
+Remove setup files and the virtual environment from the project
+
 ```bash
-# Remove setup files from the project
 make clean
+```
+
+#### Windows
+
+```powershell
+.\make.ps1 clean
 ```
 
 ## Contributing

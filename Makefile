@@ -1,8 +1,9 @@
-.PHONY: help setup clean docs get-model opt-model run-model tests
+.PHONY: help setup clean docs get-model opt-model run-model tests check-python
 
 # Virtual environement
 VENV=.venv
 PYTHON=python3
+MIN_PYTHON_VERSION=3.7
 
 # Documentation
 SPHINXBUILD   = sphinx-build
@@ -20,10 +21,11 @@ NEURALNET_FILE = $(NEURALNET_DIR)/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz
 NEURALNET_URL = https://media.katagotraining.org/uploaded/networks/models/kata1/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz
 CONFIG_FILE = $(MODEL_DIR)/default_gtp.cfg
 BENCHMARK_OUT = $(MODEL_DIR)/benchmark_output.txt
+OS := $(shell uname)
 
 help:
 	@echo "Available targets:"
-	@echo "  make setup     - Check Python version, create venv, upgrade pip, install deps, build docs"
+	@echo "  make setup     - Check python version, create venv, upgrade pip, install deps, build docs"
 	@echo "  make docs      - Open docs"
 	@echo "  make tests     - Run tests"
 	@echo "  make get-model - Download model"
@@ -31,7 +33,7 @@ help:
 	@echo "  make run-model - Start a gtp session with the model"
 	@echo "  make clean     - Remove venv, docs, model and logs"
 
-setup: $(BUILDDIR)
+setup:  $(BUILDDIR)
 	@echo "Setup complete!"
 	@echo "######################################"
 	@echo "# Please run:                        #"
@@ -39,11 +41,25 @@ setup: $(BUILDDIR)
 	@echo "#                                    #"
 	@echo "######################################"
 
+check-python:
+	@echo "Checking python version ..."; \
+	PYTHON_VERSION=$$($(PYTHON) -c 'import sys; print(".".join(map(str, sys.version_info[:3])))'); \
+	echo "Python version: $$PYTHON_VERSION"; \
+	REQUIRED=$(MIN_PYTHON_VERSION); \
+	CURRENT_MAJOR=$$(echo $$PYTHON_VERSION | cut -d. -f1); \
+	CURRENT_MINOR=$$(echo $$PYTHON_VERSION | cut -d. -f2); \
+	REQUIRED_MAJOR=$$(echo $$REQUIRED | cut -d. -f1); \
+	REQUIRED_MINOR=$$(echo $$REQUIRED | cut -d. -f2); \
+	if [ $$CURRENT_MAJOR -lt $$REQUIRED_MAJOR ] || ([ $$CURRENT_MAJOR -eq $$REQUIRED_MAJOR ] && [ $$CURRENT_MINOR -lt $$REQUIRED_MINOR ]); then \
+		echo "Python $$REQUIRED or higher is required. Found $$PYTHON_VERSION."; \
+		exit 1; \
+	fi
+
 $(BUILDDIR): $(VENV)
 	@echo "Building documentation..."
 	$(VENV)/bin/$(SPHINXBUILD) -b html $(SOURCEDIR) $(HTMLDIR)
 
-$(VENV):
+$(VENV): check-python
 	@echo "Creating virtual environment in $(VENV)..."
 	$(PYTHON) -m venv $(VENV)
 	@echo "Upgrading pip inside virtual environment..."
@@ -54,12 +70,14 @@ $(VENV):
 clean:
 	rm -rf $(VENV) $(BUILDDIR) $(MODEL_DIR) $(NEURALNET_DIR) gtp_logs
 	@echo "Removed .venv, doc builds, model and logs"
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		echo "Uninstalling KataGo via Homebrew..."; \
+		brew uninstall katago; \
+	fi
 
 docs:
 	@echo "Opening documentation..."
-	@if [ "$$OS" = "Windows_NT" ]; then \
-		start $(INDEXFILE); \
-	elif command -v xdg-open > /dev/null; then \
+	@if command -v xdg-open > /dev/null; then \
 		xdg-open $(INDEXFILE); \
 	elif command -v open > /dev/null; then \
 		open $(INDEXFILE); \
@@ -68,12 +86,21 @@ docs:
 	fi
 
 get-model: $(MODEL_FILE) $(NEURALNET_FILE)
-	@echo "Model ready !"
+	@echo "Model ready !" 
 
 $(MODEL_FILE):
 	mkdir -p $(MODEL_DIR)
 	curl -L -o $(MODEL_FILE) $(MODEL_URL)
 	unzip -d $(MODEL_DIR) $(MODEL_FILE)
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		if command -v brew >/dev/null 2>&1; then \
+			echo "Homebrew already installed."; \
+		else \
+			echo "Homebrew not installed, you will need to install it manually to continue."; \
+		fi; \
+		echo "You are on macOS, installing KataGo via Homebrew..."; \
+		brew install katago; \
+	fi
 
 $(NEURALNET_FILE):
 	mkdir -p $(NEURALNET_DIR)
@@ -89,11 +116,19 @@ opt-model: $(BENCHMARK_OUT)
 $(BENCHMARK_OUT): $(MODEL_FILE) $(NEURALNET_FILE)
 	@echo "Starting benchmark procedure, this will take a while... (crtl + C to cancel)"
 	@sleep 5
-	$(MODEL_DIR)/katago benchmark -model $(NEURALNET_FILE) -config $(CONFIG_FILE) | tee $(MODEL_DIR)/benchmark_output.txt
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		katago benchmark -model $(NEURALNET_FILE) -config $(CONFIG_FILE) | tee $(MODEL_DIR)/benchmark_output.txt; \
+	else \
+		$(MODEL_DIR)/katago benchmark -model $(NEURALNET_FILE) -config $(CONFIG_FILE) | tee $(MODEL_DIR)/benchmark_output.txt; \
+	fi
 
 run-model: $(MODEL_FILE) $(NEURALNET_FILE)
 	@echo "Starting KataGo..."
-	$(MODEL_DIR)/katago gtp -model $(NEURALNET_FILE) -config $(CONFIG_FILE)
+	@if [ "$$(uname)" = "Darwin" ]; then \
+		katago gtp -model '$(NEURALNET_FILE)' -config '$(CONFIG_FILE)'; \
+	else \
+		$(MODEL_DIR)/katago gtp -model $(NEURALNET_FILE) -config $(CONFIG_FILE); \
+	fi
 
 tests:
 	$(VENV)/bin/python3 -m pytest -v
