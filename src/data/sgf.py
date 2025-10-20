@@ -11,7 +11,7 @@ Modules:
 """
 
 import os
-from typing import Dict, List, Optional, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .game import Game
@@ -128,7 +128,9 @@ class SgfTree:
                 file.write(sgf_string)
 
         return sgf_string
-
+    
+    def to_gtp_move_list(self) -> List[List[str]]:
+        pass
 
 def parse(input):
     """Parse an SGF string into an SgfTree object.

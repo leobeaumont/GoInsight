@@ -27,10 +27,13 @@ class Game:
         AW (List[str], optional): Locations of White stones to be placed on the board prior to the first move. 
 
     Attributes:
-        attrname (attrtype): Attribut description.
+        ruleset (str): Ruleset (e.g.: Japanese).
+        size (Tuple[int, int]): Size of the board, non-square boards are supported.
+        komi (float): Komi.
+        handicap (int): Number of handicap stones given to Black.
 
     Methods:
-        from_sgf(path): Create a Game object from an sgf file.
+        from_sgftree(SgfTree): Create a Game object from an SgfTree.
     """
 
     def __init__(
