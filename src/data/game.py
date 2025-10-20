@@ -10,7 +10,7 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple, Union
 from .move import Move
 from .sgf import SgfTree
 
@@ -19,12 +19,12 @@ class Game:
     Manages game's data with various tools.
 
     Args:
-        RU (str): Ruleset (e.g.: Japanese). 
-        SZ (str): Size of the board, non-square boards are supported. 
-        KM (str): Komi. 
-        HA (str, optional): Number of handicap stones given to Black. Placement of the handicap stones are set using the AB property. 
-        AB (str, optional): Locations of Black stones to be placed on the board prior to the first move. 
-        AW (str, optional): Locations of White stones to be placed on the board prior to the first move. 
+        RU (List[str]): Ruleset (e.g.: Japanese). 
+        SZ (List[str]): Size of the board, non-square boards are supported. 
+        KM (List[str]): Komi. 
+        HA (List[str], optional): Number of handicap stones given to Black. Placement of the handicap stones are set using the AB property. 
+        AB (List[str], optional): Locations of Black stones to be placed on the board prior to the first move. 
+        AW (List[str], optional): Locations of White stones to be placed on the board prior to the first move. 
 
     Attributes:
         attrname (attrtype): Attribut description.
@@ -35,15 +35,30 @@ class Game:
 
     def __init__(
         self,
-        RU: str,
-        SZ: str,
-        KM: str,
-        HA: Optional[str] = "0",
-        AB: Optional[str] = None,
-        AW: Optional[str] = None,
+        RU: List[str],
+        SZ: List[str],
+        KM: List[str],
+        HA: Optional[List[str]] = ["0"],
+        AB: Optional[List[str]] = None,
+        AW: Optional[List[str]] = None,
         **kwargs
     ):
-        self.rul
+        self.ruleset: str = RU[0]
+         
+        size = [int(txt) for txt in SZ[0].split(":")]
+        if len(size) == 1:
+            size *= 2
+        self.size: Tuple[int, int] = size
+
+        self.komi: float = float(KM[0])
+
+        self.handicap: int = int(HA[0])
+
+        if AB:
+            self.place("black", [Move.gtp_to_coord(gtp_pos) for gtp_pos in AB])
+        
+        if AW:
+            self.place("white", [Move.gtp_to_coord(gtp_pos) for gtp_pos in AW])
     
     @classmethod
     def from_sgftree(cls, tree: SgfTree) -> "Game":
@@ -56,9 +71,10 @@ class Game:
         Returns:
             (Game): The game provided in the sgf tree.
         """
-        game = Game()
+        root_properties = tree.properties
+        game = Game(**root_properties)
 
-    def next_color() -> str:
+    def next_color(self) -> str:
         """
         Tells if it is black's or white's turn.
 
@@ -69,7 +85,7 @@ class Game:
         # If black has bonus stones to handicap white, white start the game. Except if black has only one bonus stone, then black starts the game.
         pass
 
-    def is_valid_pos(pos: Tuple[int, int]) -> bool:
+    def is_valid_pos(self, pos: Tuple[int, int]) -> bool:
         """
         Tells if a position is valid for a move.
 
@@ -79,4 +95,35 @@ class Game:
         Returns:
             (bool): Wether the position is playable or not.
         """
+        pass
+    
+    @overload
+    def place(self, color: str, pos: Tuple[int, int]):
+        """
+        Place a stone with the chosen color and coordinates.
+
+        Args:
+            color (str): Color of the stone.
+            pos (Tuple[int, int]): Coordinates of the stone.
+
+        Raises:
+            ValueError: If the coordinates is invalid.
+        """
+        ...
+
+    @overload
+    def place(self, color: str, pos: List[Tuple[int, int]]):
+        """
+        Place stones with the chosen color and coordinates.
+
+        Args:
+            color (str): Color of the stone.
+            pos (List[Tuple[int, int]]): List of coordinates of the stones.
+
+        Raises:
+            ValueError: If one of the coordinates is invalid.
+        """
+        ...
+    
+    def place(self, color: str, pos: Union[Tuple[int, int], List[Tuple[int, int]]]):
         pass

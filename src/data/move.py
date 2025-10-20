@@ -56,7 +56,19 @@ class Move:
                 raise ValueError("Invalid position")
         self.pos = pos
 
-    
+    @classmethod
+    def sgf_to_coord(cls, sgf_pos: str) -> Tuple[int, int]:
+        """
+        Translate sgf coordinate format to a simple coordinates.
+
+        Args:
+            sgf_pos (str): Coordinates in the SGF format.
+
+        Return:
+            (Tuple[int, int]): The corresponding coordinates.
+        """
+        pass
+
     def to_gtp(self) -> str:
         """
         Translate the move to the gtp format.
