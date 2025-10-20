@@ -1,3 +1,4 @@
+from copy import deepcopy
 import json
 import os
 import platform
@@ -52,3 +53,38 @@ def get_katago_score_mean(tree: SgfTree):
         os.remove(path_output) #We delete the analysis_output.json file
 
     return scoreMean
+
+def without_last_move(tree: SgfTree):
+    new_tree = deepcopy(tree)
+    if len(new_tree.get_main_sequence()) > 1:
+        current = new_tree
+        parrent = None
+        while len(current.children)>0:
+            parrent = current
+            current = current.children[0]
+        if parrent is not None:
+            parrent.children = []
+    return new_tree
+
+def rating_last_move(tree: SgfTree):
+    score_mean_after = get_katago_score_mean(tree)
+    score_mean_before = get_katago_score_mean(without_last_move(tree))
+    rate = score_mean_after / score_mean_before * 100 #Percentage of precision compared to the best move
+    return rate
+
+def analyze_last_move(tree: SgfTree):
+
+    rate = rating_last_move(tree)
+    penultimate_rate = rating_last_move(without_last_move(tree))
+
+    if penultimate_rate < 10:
+        if rate < 30:
+            return "Missed opportunity"
+    if rate <= 0 : 
+        return "Blunder"
+    if rate >= 99 : 
+        return "Best move"
+    if rate >= 60 :
+        return "Good move"
+    else : 
+        return "Mistake"
