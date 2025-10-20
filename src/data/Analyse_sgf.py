@@ -60,11 +60,14 @@ def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, 
 
 if __name__ == "__main__":
     # Define your paths and moves
-    katago_exec_path = "/Users/.../katago"
-    config_file_path = "/Users/.../my_benchmark.cfg"
-    model_file_path = "/Users/.../model.bin.gz"
+    katago_exec_path = "/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/katago"
+    config_file_path = "/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/my_benchmark.cfg"
+    model_file_path = "/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/model.bin.gz"
+    moves_string = "[('b', (1, 1)), ('w', (2, 1)), ('b', (2, 2)), ('w', (3, 2)), ('b', (2, 3)), ('w', (3, 3))]"
 
-    path = "/Users/.../....sgf"
+
+    game_name = input("Name of the game to analyze")
+    path = f"/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/Matches/{game_name}.sgf"
     game = sgf_list(path)
     
     print("Choose coordonate and size to analyze e.g. A1")
@@ -77,7 +80,11 @@ if __name__ == "__main__":
     for i in game :
         if i[1][0]>=repere_X[0] and i[1][0]<=repere_X[1]:
             if i[1][1]>=repere_Y[0] and i[1][1]<=repere_Y[1]:
-                new_game.append(i)
+                new_pos = (i[0],(i[1][0]-repere_X[0],i[1][1]-repere_Y[0]))
+                print(i)
+                print(new_pos)
+                new_game.append(new_pos)
+    print(new_game)
 
 
     run_katago_analysis(
