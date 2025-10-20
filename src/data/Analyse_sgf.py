@@ -1,10 +1,10 @@
 import subprocess
 import shlex
-from sgftolist import sgf_list
+from sgf_to_list import sgf_list
 import ast
 
 
-def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, size_to_analyze):
+def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, sizeX = "19", sizeY = "19"):
     """
     Executes the KataGo analysis command using subprocess.
 
@@ -16,12 +16,13 @@ def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, 
                                 e.g., "[('b',(3,0)),('w',(1,0))]"
     """
     command = (
-        f"python analysis_katago.py "
+        f"python katago_analysis.py "
         f"-katago-path {shlex.quote(katago_path)} "
         f"-config-path {shlex.quote(config_path)} "
         f"-model-path {shlex.quote(model_path)} "
         f"-moves-to-analyze {shlex.quote(moves_to_analyze)} "
-        f"-size-to-analyze {shlex.quote(size_to_analyze)} "
+        f"-sizeX-to-analyze {shlex.quote(sizeX)} "
+        f"-sizeY-to-analyze {shlex.quote(sizeY)}"
     )
 
     print(f"Executing command: {command}")
@@ -66,16 +67,18 @@ if __name__ == "__main__":
     moves_string = "[('b', (1, 1)), ('w', (2, 1)), ('b', (2, 2)), ('w', (3, 2)), ('b', (2, 3)), ('w', (3, 3))]"
 
 
-    game_name = input("Name of the game to analyze")
+    game_name = input("Name of the game to analyze : ")
     path = f"/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/Matches/{game_name}.sgf"
     game = sgf_list(path)
     
     print("Choose coordonate and size to analyze e.g. A1")
-    coord = input("Coord of new board")
-    size = input("Size to analyze")
+    coord = input("Coord of new board : ")
+    print("Size of the board to analyze (square or rectangular)")
+    sizeX = input("SizeX to analyze : ")
+    sizeY = input("SizeY to analyze : ")
 
-    repere_X = (ord(coord[0])-ord('A'), ord(coord[0])-ord('A')+int(size)-1)
-    repere_Y = (int(coord[1])-1, int(coord[1]) + int(size)-2)
+    repere_X = (ord(coord[0])-ord('A'), ord(coord[0])-ord('A')+int(sizeX)-1)
+    repere_Y = (int(coord[1])-1, int(coord[1]) + int(sizeY)-2)
     new_game =[]
     for i in game :
         if i[1][0]>=repere_X[0] and i[1][0]<=repere_X[1]:
@@ -92,5 +95,6 @@ if __name__ == "__main__":
         config_file_path,
         model_file_path,
         str(new_game),
-        size
+        sizeX,
+        sizeY
     )

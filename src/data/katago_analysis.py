@@ -50,7 +50,7 @@ class KataGo:
     def close(self):
         self.katago.stdin.close()
 
-    def query(self, initial_board: sgfmill.boards.Board, moves: List[Tuple[Color, Move]], komi: float, max_visits=None):
+    def query(self, initial_board: sgfmill.boards.Board, moves: List[Tuple[Color, Move]], komi: float, max_visits=None, sizeX: int = 19, sizeY: int = 19):
         query = {}
         query["id"] = str(self.query_counter)
         self.query_counter += 1
@@ -66,8 +66,8 @@ class KataGo:
 
         query["rules"] = "Chinese"
         query["komi"] = komi
-        query["boardXSize"] = initial_board.side
-        query["boardYSize"] = initial_board.side
+        query["boardXSize"] = sizeX
+        query["boardYSize"] = sizeY
         query["includePolicy"] = True
         if max_visits is not None:
             query["maxVisits"] = max_visits
@@ -122,7 +122,13 @@ if __name__ == "__main__":
         help="Python list of moves, e.g. \"[('b',(3,0)),('w',(1,0))]"
     )
     parser.add_argument(
-        "-size-to-analyze",
+        "-sizeX-to-analyze",
+        type=str,
+        default="19",
+        help="Size of the board"
+    )
+    parser.add_argument(
+        "-sizeY-to-analyze",
         type=str,
         default="19",
         help="Size of the board"
@@ -132,11 +138,13 @@ if __name__ == "__main__":
 
     moves_to_analyze = parse_moves(args["moves_to_analyze"])
     print("Moves to analyze:", moves_to_analyze)
-    print("SIZE TO analyze:", int(args["size_to_analyze"]))
 
     katago = KataGo(args["katago_path"], args["config_path"], args["model_path"])
 
-    board_size = int(args["size_to_analyze"])  # Change if needed
+    sizeX = int(args["sizeX_to_analyze"])
+    sizeY = int(args["sizeY_to_analyze"])
+
+    board_size = max(sizeX,sizeY)  # Change if needed
     board = sgfmill.boards.Board(board_size)
     komi = 6.5
 
@@ -151,6 +159,6 @@ if __name__ == "__main__":
     print(sgfmill.ascii_boards.render_board(displayboard))
 
     print("Query result:")
-    print(katago.query(board, moves_to_analyze, komi))
+    print(katago.query(board, moves_to_analyze, komi, sizeX=sizeX, sizeY=sizeY))
 
     katago.close()
