@@ -16,9 +16,9 @@ def get_katago_score_mean(tree: SgfTree):
     if platform.system() == "Darwin":
         model_path="/opt/homebrew/share/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
     elif platform.system() == "Linux":
-            model_path="/model/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
+        model_path="/model/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
     else:
-            model_path="C:\\katago\\kata1-b18c384nbt-s9996604416-d4316597426.bin.gz" #WINDOWS À CHANGER
+        model_path="C:\\katago\\kata1-b18c384nbt-s9996604416-d4316597426.bin.gz" #WINDOWS À CHANGER
         
     path_input = "../../games/analysis_input.txt"
     path_output = "../../analysis_output.json"
