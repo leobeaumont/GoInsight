@@ -5,14 +5,15 @@ import platform
 import subprocess
 from ..data.sgf import SgfTree
 
-def get_katago_score_mean(tree: SgfTree):
+def katago_analysis(tree: SgfTree):
     """
-    This function performs an analysis of a Go game position using KataGo and returns the score mean.
-    It creates an input file for KataGo, runs the analysis, reads the output file, and extracts the score mean from the results.
+    This function performs an analysis of a Go game position using KataGo and returns the score lead and candidate moves.
+    It creates an input file for KataGo, runs the analysis, reads the output file, and extracts the score lead from the results.
     Args:
         tree (SgfTree): The SGF tree representing the game position to analyze.
     Returns:
-        float: The score mean from the KataGo analysis.
+        float: The score lead from the KataGo analysis.
+        dict: A dictionary mapping each move to its score lead.
     """
     if platform.system() == "Darwin":
         model_path="/opt/homebrew/share/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
@@ -47,29 +48,29 @@ def get_katago_score_mean(tree: SgfTree):
     with open(path_output, "r") as f: #Read the analysis_output.json file
         txt = f.read()
     output_data = json.loads(txt) #We create a dictionary from the JSON text
-    scoreMean = output_data["scoreMean"] 
+    scoreLead = output_data["rootInfo"]["scoreLead"]
+    candidate_moves = {move["move"]: move["scoreLead"] for move in output_data["moveInfos"]}
     
     if os.path.exists(path_output):
         os.remove(path_output) #We delete the analysis_output.json file
 
-    return scoreMean
+    return scoreLead, candidate_moves
 
 def without_last_move(tree: SgfTree):
     new_tree = deepcopy(tree)
-    if len(new_tree.get_main_sequence()) > 1:
-        current = new_tree
-        parrent = None
-        while len(current.children)>0:
-            parrent = current
-            current = current.children[0]
-        if parrent is not None:
-            parrent.children = []
+    current = new_tree
+    parrent = None
+    while len(current.children)>0:
+        parrent = current
+        current = current.children[0]
+    if parrent is not None:
+        parrent.children = []
     return new_tree
 
 def rating_last_move(tree: SgfTree):
-    score_mean_after = get_katago_score_mean(tree)
-    score_mean_before = get_katago_score_mean(without_last_move(tree))
-    rate = score_mean_after / score_mean_before * 100 #Percentage of precision compared to the best move
+    score_lead_after, _ = katago_analysis(tree)[0]
+    score_lead_before = katago_analysis(without_last_move(tree))[0]
+    rate = score_lead_after / score_lead_before * 100 #Percentage of precision compared to the best move
     return rate
 
 def analyze_last_move(tree: SgfTree):
