@@ -4,6 +4,7 @@ from sgf_to_list import sgf_list
 import ast
 
 
+
 def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, sizeX = "19", sizeY = "19"):
     """
     Executes the KataGo analysis command using subprocess.
@@ -16,7 +17,7 @@ def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, 
                                 e.g., "[('b',(3,0)),('w',(1,0))]"
     """
     command = (
-        f"python katago_analysis.py "
+        f"python src/data/katago_analysis.py "
         f"-katago-path {shlex.quote(katago_path)} "
         f"-config-path {shlex.quote(config_path)} "
         f"-model-path {shlex.quote(model_path)} "
@@ -61,10 +62,9 @@ def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, 
 
 if __name__ == "__main__":
     # Define your paths and moves
-    katago_exec_path = "/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/katago"
-    config_file_path = "/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/my_benchmark.cfg"
-    model_file_path = "/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/model.bin.gz"
-    moves_string = "[('b', (1, 1)), ('w', (2, 1)), ('b', (2, 2)), ('w', (3, 2)), ('b', (2, 3)), ('w', (3, 3))]"
+    katago_exec_path = "./model/katago"
+    config_file_path = "./model/default_gtp.cfg"
+    model_file_path = "./neuralnet/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz"
 
 
     game_name = input("Name of the game to analyze : ")
@@ -84,10 +84,7 @@ if __name__ == "__main__":
         if i[1][0]>=repere_X[0] and i[1][0]<=repere_X[1]:
             if i[1][1]>=repere_Y[0] and i[1][1]<=repere_Y[1]:
                 new_pos = (i[0],(i[1][0]-repere_X[0],i[1][1]-repere_Y[0]))
-                print(i)
-                print(new_pos)
                 new_game.append(new_pos)
-    print(new_game)
 
 
     run_katago_analysis(
