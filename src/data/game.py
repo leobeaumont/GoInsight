@@ -10,7 +10,7 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import Tuple
+from typing import Optional, Tuple
 from .move import Move
 from .sgf import SgfTree
 
@@ -19,7 +19,12 @@ class Game:
     Manages game's data with various tools.
 
     Args:
-        argname (argtype): Description of the arg. 
+        RU (str): Ruleset (e.g.: Japanese). 
+        SZ (str): Size of the board, non-square boards are supported. 
+        KM (str): Komi. 
+        HA (str, optional): Number of handicap stones given to Black. Placement of the handicap stones are set using the AB property. 
+        AB (str, optional): Locations of Black stones to be placed on the board prior to the first move. 
+        AW (str, optional): Locations of White stones to be placed on the board prior to the first move. 
 
     Attributes:
         attrname (attrtype): Attribut description.
@@ -28,8 +33,17 @@ class Game:
         from_sgf(path): Create a Game object from an sgf file.
     """
 
-    def __init__(self):
-        pass
+    def __init__(
+        self,
+        RU: str,
+        SZ: str,
+        KM: str,
+        HA: Optional[str] = "0",
+        AB: Optional[str] = None,
+        AW: Optional[str] = None,
+        **kwargs
+    ):
+        self.rul
     
     @classmethod
     def from_sgftree(cls, tree: SgfTree) -> "Game":
@@ -42,7 +56,7 @@ class Game:
         Returns:
             (Game): The game provided in the sgf tree.
         """
-        return tree.to_game()
+        game = Game()
 
     def next_color() -> str:
         """
@@ -52,6 +66,7 @@ class Game:
             (str): 'b' for black and 'w' for white.
         """
         # Notes: by default black start the game
+        # If black has bonus stones to handicap white, white start the game. Except if black has only one bonus stone, then black starts the game.
         pass
 
     def is_valid_pos(pos: Tuple[int, int]) -> bool:
