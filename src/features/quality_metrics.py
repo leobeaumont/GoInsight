@@ -12,8 +12,9 @@ def katago_analysis(tree: SgfTree):
     Args:
         tree (SgfTree): The SGF tree representing the game position to analyze.
     Returns:
-        float: The score lead from the KataGo analysis.
-        dict: A dictionary mapping each move to its score lead.
+        float: The score lead at the current position.
+        list: A list of candidate moves.
+        float: The win probability at the current position.
     """
     if platform.system() == "Darwin":
         model_path="/opt/homebrew/share/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
