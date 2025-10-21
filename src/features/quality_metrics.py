@@ -47,16 +47,23 @@ def katago_analysis(tree: SgfTree):
 
     with open(path_output, "r") as f: #Read the analysis_output.json file
         txt = f.read()
-    output_data = json.loads(txt) #We create a dictionary from the JSON text
-    scoreLead = output_data["rootInfo"]["scoreLead"]
+    output_data = json.loads(txt) 
+
+    #Extraction of data from the JSON text
+
+    scoreLead = output_data["rootInfo"]["scoreLead"] 
     candidate_moves = {move["move"]: move["scoreLead"] for move in output_data["moveInfos"]}
-    
+    win_probability = output_data["rootInfo"]["winrate"]
+
     if os.path.exists(path_output):
         os.remove(path_output) #We delete the analysis_output.json file
 
-    return scoreLead, candidate_moves
+    return scoreLead, candidate_moves, win_probability
 
 def without_last_move(tree: SgfTree):
+    """
+    Returns a new SgfTree without the last move.
+    """
     new_tree = deepcopy(tree)
     current = new_tree
     parrent = None
@@ -68,13 +75,18 @@ def without_last_move(tree: SgfTree):
     return new_tree
 
 def rating_last_move(tree: SgfTree):
+    """
+    This function rates the last move played in a Go game position by comparing the score lead before and after the move using KataGo analysis.
+    """
     score_lead_after, _ = katago_analysis(tree)[0]
     score_lead_before = katago_analysis(without_last_move(tree))[0]
     rate = score_lead_after / score_lead_before * 100 #Percentage of precision compared to the best move
     return rate
 
 def analyze_last_move(tree: SgfTree):
-
+    """
+    This function analyzes the last move played in a Go game position.
+    """
     rate = rating_last_move(tree)
     penultimate_rate = rating_last_move(without_last_move(tree))
 
@@ -89,3 +101,38 @@ def analyze_last_move(tree: SgfTree):
         return "Good move"
     else : 
         return "Mistake"
+    
+def count_moves(tree: SgfTree):
+    """
+    This function counts the number of moves played in a Go game represented by an SgfTree.
+    Args:
+        tree (SgfTree): The SGF tree representing the game.
+    Returns:
+        int: The number of moves played in the game.
+    """
+    if tree is None:
+        return 0
+    count = 0
+    current = tree
+    while current.children:
+        current = current.children[0]
+        count += 1
+    return count
+
+def analyse_game(tree: SgfTree):
+    """
+    This function analyzes a Go game represented by an SgfTree and provides insights on the quality of moves played.
+    Args:
+        tree (SgfTree): The SGF tree representing the game.
+    Returns:
+        list[list]: A list of lists containing the score lead and winrate after each move of the game.
+    """
+    move_qualities = []
+    current_tree = deepcopy(tree)
+    total_moves = count_moves(tree)
+    for _ in range(total_moves):
+        scoreLead, winrate = analyze_last_move(current_tree)[0], analyze_last_move(current_tree)[2]
+        move_qualities.append([scoreLead, winrate])
+        current_tree = without_last_move(current_tree)
+    move_qualities.reverse()  # Reverse to match the original move order
+    return move_qualities
