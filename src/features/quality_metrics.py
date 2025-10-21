@@ -141,10 +141,8 @@ def analyse_game(tree: SgfTree):
 
 if __name__ == "__main__":
     from src.data.sgf import SgfTree
-
     # Création de l'arbre racine
     test_game = SgfTree()
-
     # On ajoute un coup noir puis blanc
     test_game.children.append(SgfTree({"B": ["dd"]}))
     test_game.children[0].children.append(SgfTree({"W": ["pp"]}))

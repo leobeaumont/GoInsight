@@ -132,7 +132,7 @@ class SgfTree:
     def to_gtp_move_list(self) -> List[List[str]]:
         """Convert the moves in this SgfTree to a list of GTP-formatted moves.
         Returns:
-            list: A list of moves in GTP format, where each move is represented as ["color", "position"].
+            list: A list of moves in GTP format, where each move is represented as ["color", "position"] (e.g., ["B", "A18"]).
         """
         moves = []
         current_node = self
@@ -140,18 +140,18 @@ class SgfTree:
             if 'B' in current_node.properties:
                 sgf_move = current_node.properties['B'][0]
                 gtp_move = self.sgf_to_gtp(sgf_move)
-                moves.append(['B', gtp_move])
+                moves.append(["B", gtp_move])
             elif 'W' in current_node.properties:
                 sgf_move = current_node.properties['W'][0]
                 gtp_move = self.sgf_to_gtp(sgf_move)
-                moves.append(['W', gtp_move])
+                moves.append(["W", gtp_move])
             if current_node.children:
                 current_node = current_node.children[0]
             else:
                 break
         return moves
-    
-    def sgf_to_gtp(sgf_pos: str) -> str:
+
+    def sgf_to_gtp(self, sgf_pos: str) -> str:
         """Convert an SGF position to GTP format.
 
         Args:
@@ -169,8 +169,6 @@ class SgfTree:
         row = str(19 - inversed_row_index)
         return  f"{col}{row}"
         
-
-
 def parse(input):
     """Parse an SGF string into an SgfTree object.
 
