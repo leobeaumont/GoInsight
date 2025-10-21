@@ -28,7 +28,7 @@ class Game:
 
     Attributes:
         ruleset (str): Ruleset (e.g.: Japanese).
-        size (Tuple[int, int]): Size of the board, non-square boards are supported.
+        size (Tuple[int, int]): Width and height of the board, non-square boards are supported.
         komi (float): Komi.
         handicap (int): Number of handicap stones given to Black.
 
@@ -58,10 +58,10 @@ class Game:
         self.handicap: int = int(HA[0])
 
         if AB:
-            self.place("black", [Move.gtp_to_coord(gtp_pos) for gtp_pos in AB])
+            self.place("black", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AB])
         
         if AW:
-            self.place("white", [Move.gtp_to_coord(gtp_pos) for gtp_pos in AW])
+            self.place("white", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AW])
     
     @classmethod
     def from_sgftree(cls, tree: SgfTree) -> "Game":

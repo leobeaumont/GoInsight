@@ -11,7 +11,7 @@ Modules:
 """
 
 import os
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .game import Game
