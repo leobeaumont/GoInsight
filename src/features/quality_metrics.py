@@ -23,8 +23,9 @@ def katago_analysis(tree: SgfTree):
     else:
         model_path="C:\\katago\\kata1-b18c384nbt-s9996604416-d4316597426.bin.gz" #WINDOWS À CHANGER
         
-    path_input = "../../games/analysis_input.txt"
-    path_output = "../../analysis_output.json"
+    path_input = "games/analysis_input.txt"
+    path_output = "analysis_output.json"
+    config_path = "analysis.cfg"
     moves_list = json.dumps(tree.to_gtp_move_list())
 
     json_text = f'{{"id":"pos1","moves":{moves_list},"rules":"japanese","komi":7.5,"boardXSize":19,"boardYSize":19,"maxVisits":100}}'
@@ -37,7 +38,7 @@ def katago_analysis(tree: SgfTree):
     "katago",
     "analysis",
     "-model", model_path,
-    "-config", "../../analysis.cfg"
+    "-config", config_path
     ]
 
     with open(path_input, "r") as infile, open(path_output, "w") as outfile:
@@ -54,12 +55,12 @@ def katago_analysis(tree: SgfTree):
 
     scoreLead = output_data["rootInfo"]["scoreLead"] 
     candidate_moves = {move["move"]: move["scoreLead"] for move in output_data["moveInfos"]}
-    win_probability = output_data["rootInfo"]["winrate"]
+    winrate = output_data["rootInfo"]["winrate"]
 
     if os.path.exists(path_output):
         os.remove(path_output) #We delete the analysis_output.json file
 
-    return scoreLead, candidate_moves, win_probability
+    return scoreLead, candidate_moves, winrate
 
 def without_last_move(tree: SgfTree):
     """
@@ -137,3 +138,17 @@ def analyse_game(tree: SgfTree):
         current_tree = without_last_move(current_tree)
     move_qualities.reverse()  # Reverse to match the original move order
     return move_qualities
+
+if __name__ == "__main__":
+    from src.data.sgf import SgfTree
+
+    # Création de l'arbre racine
+    test_game = SgfTree()
+
+    # On ajoute un coup noir puis blanc
+    test_game.children.append(SgfTree({"B": ["dd"]}))
+    test_game.children[0].children.append(SgfTree({"W": ["pp"]}))
+    score_lead, candidate_moves, winrate = katago_analysis(test_game)
+    print("Score Lead:", score_lead)
+    print("Candidate Moves:", candidate_moves)
+    print("Win Rate:", winrate)

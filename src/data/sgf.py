@@ -12,7 +12,7 @@ Modules:
 
 import os
 from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
-
+from .constants import VALID_COLUMN
 if TYPE_CHECKING:
     from .game import Game
 
@@ -130,7 +130,46 @@ class SgfTree:
         return sgf_string
     
     def to_gtp_move_list(self) -> List[List[str]]:
-        pass
+        """Convert the moves in this SgfTree to a list of GTP-formatted moves.
+        Returns:
+            list: A list of moves in GTP format, where each move is represented as ["color", "position"].
+        """
+        moves = []
+        current_node = self
+        while current_node:
+            if 'B' in current_node.properties:
+                sgf_move = current_node.properties['B'][0]
+                gtp_move = self.sgf_to_gtp(sgf_move)
+                moves.append(['B', gtp_move])
+            elif 'W' in current_node.properties:
+                sgf_move = current_node.properties['W'][0]
+                gtp_move = self.sgf_to_gtp(sgf_move)
+                moves.append(['W', gtp_move])
+            if current_node.children:
+                current_node = current_node.children[0]
+            else:
+                break
+        return moves
+    
+    def sgf_to_gtp(sgf_pos: str) -> str:
+        """Convert an SGF position to GTP format.
+
+        Args:
+            sgf_pos (str): The position in SGF format (e.g., 'ab', 'ip', ...).
+
+        Returns:
+            str: The position in GTP format (e.g., "A18", "J4", ...).
+        """
+        if sgf_pos == '':
+            return "pass"
+        alphabet = 'abcdefghijklmnopqrstuvwxyz'
+        index_col = alphabet.index(sgf_pos[0])
+        col = VALID_COLUMN[index_col]
+        inversed_row_index = alphabet.index(sgf_pos[1])
+        row = str(19 - inversed_row_index)
+        return  f"{col}{row}"
+        
+
 
 def parse(input):
     """Parse an SGF string into an SgfTree object.
