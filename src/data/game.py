@@ -11,6 +11,7 @@ Modules:
 """
 
 from typing import List, Optional, Tuple, Union
+from .board import Board
 from .move import Move
 from .sgf import SgfTree
 
@@ -31,6 +32,8 @@ class Game:
         size (Tuple[int, int]): Width and height of the board, non-square boards are supported.
         komi (float): Komi.
         handicap (int): Number of handicap stones given to Black.
+        board (Board): Board of the game, used to store board states.
+        moves (List[str]): Sequence of moves in GTP format (e.g.: ["W A19", "B B18", "W pass"])
 
     Methods:
         from_sgftree(SgfTree): Create a Game object from an SgfTree.
@@ -46,6 +49,7 @@ class Game:
         AW: Optional[List[str]] = None,
         **kwargs
     ):
+        # Initialisation attributes
         self.ruleset: str = RU[0]
          
         size = [int(txt) for txt in SZ[0].split(":")]
@@ -57,6 +61,11 @@ class Game:
 
         self.handicap: int = int(HA[0])
 
+        # Variable/storage attributes
+        self.board: Board = Board(self, size)
+        self.moves: List[Move] = list()
+
+        # Board setup
         if AB:
             self.place("black", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AB])
         
@@ -77,16 +86,21 @@ class Game:
         root_properties = tree.properties
         game = Game(**root_properties)
 
+        game.moves.extend(tree.move_sequence())
+        # A finir: il faut update le board avec la sequence de coups
+
     def next_color(self) -> str:
         """
         Tells if it is black's or white's turn.
 
         Returns:
-            (str): 'b' for black and 'w' for white.
+            (str): 'B' for black and 'W' for white.
         """
         # Notes: by default black start the game
         # If black has bonus stones to handicap white, white start the game. Except if black has only one bonus stone, then black starts the game.
-        pass
+        if not self.moves:
+            return "B" if self.handicap < 2 else "W"
+        return "BW"[self.moves[-1][0] == "B"] # Returns 'W' if last move is 'B' and 'B' otherwise.
 
     def is_valid_pos(self, pos: Tuple[int, int]) -> bool:
         """

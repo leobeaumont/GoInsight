@@ -57,17 +57,39 @@ class Move:
         self.pos = pos
 
     @classmethod
-    def sgf_to_coord(cls, sgf_pos: str) -> Tuple[int, int]:
+    def sgf_to_coord(cls, sgf_pos: str) -> Optional[Tuple[int, int]]:
         """
-        Translate sgf coordinate format to a simple coordinates.
+        Translate SGF coordinate format to a simple coordinates.
 
         Args:
             sgf_pos (str): Coordinates in the SGF format.
 
-        Return:
-            (Tuple[int, int]): The corresponding coordinates.
+        Returns:
+            (Tuple[int, int], optional): The corresponding coordinates.
         """
+        if sgf_pos == "":
+            return None
         return (VALID_COLUMN_SGF.index(sgf_pos[0]), VALID_COLUMN_SGF.index(sgf_pos[1]))
+    
+    @classmethod
+    def sgf_to_gtp(cls, sgf_pos: str, board_size: Tuple[int, int]) -> str:
+        """
+        Translate SGF coordinate format to GTP coordinate format.
+
+        Args:
+            sgf_pos (str): Coordinates in the SGF format.
+
+        Returns:
+            (str): The corresponding position in GTP format ('pass' if sgf_pos is empty).
+        """
+        coords = Move.sgf_to_coord(sgf_pos)
+
+        if coords is None:
+            return "pass"
+        
+        col = VALID_COLUMN_GTP[coords[0]]
+        line = str(board_size[1] - coords[1])
+        return col + line
 
     def to_gtp(self) -> str:
         """
