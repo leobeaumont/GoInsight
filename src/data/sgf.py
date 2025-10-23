@@ -178,7 +178,7 @@ class SgfTree:
         Raises:
             KeyError: If the root of the tree doesn't have a 'SZ' property.
         """
-        board_size = [int(txt) for txt in self.properties["SZ"][0].split(":")]
+        board_size = (int(txt) for txt in self.properties["SZ"][0].split(":"))
         if len(board_size) == 1:
             board_size *= 2
         return board_size
