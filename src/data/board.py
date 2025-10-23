@@ -44,7 +44,7 @@ class Board:
     ):
         self.game = game
         self.size = size
-        self.sequence = [Move]
+        self.sequence: List[Move] = None
 
 
     

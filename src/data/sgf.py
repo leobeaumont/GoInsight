@@ -11,7 +11,7 @@ Modules:
 """
 
 import os
-from typing import Dict, List, Optional, TYPE_CHECKING, Union
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from .game import Game
@@ -129,12 +129,13 @@ class SgfTree:
 
         return sgf_string
     
-    def move_sequence(self, list_separated: bool = False) -> Union[List[str], List[List[str]]]:
+    def move_sequence(self, board_size: Optional[Tuple[int, int]] = None, list_separated: bool = False) -> Union[List[str], List[List[str]]]:
         """Obtain the sequence of moves from the tree.
 
         This method generates a list of moves in the GTP format.
 
         Args:
+            board_size (Tuple[int, int], optional): Size of the board. If not provided, it is fetched from the tree.
             list_separated (bool, optional): If true, the color and the GTP coordinates are inserted into a list. Default to False. 
 
         Returns:
@@ -149,6 +150,9 @@ class SgfTree:
         """
         from .move import Move
 
+        if board_size is None:
+            board_size = self.get_board_size()
+
         sequence: List[str] = list()
         current_node: SgfTree = self
 
@@ -156,15 +160,29 @@ class SgfTree:
             for color in ("B", "W"):
                 move = current_node.properties.get(color)
                 if move:
-                    gtp_move = f"{color} {Move.sgf_to_gtp(move)}"
+                    gtp_move = f"{color} {Move.sgf_to_gtp(move[0], board_size)}"
                     if list_separated:
                         gtp_move = gtp_move.split(" ")
-                    sequence.append()
+                    sequence.append(gtp_move)
                     break  # there can't be a white move if there is already a black move
 
             current_node = current_node.children[0] if current_node.children else None
 
         return sequence
+    
+    def get_board_size(self) -> Tuple[int, int]:
+        """ Fetch the board size from the properties of the root
+
+        Returns:
+            (Tuple[int, int]): The size of the board.
+
+        Raises:
+            KeyError: If the root of the tree doesn't have a 'SZ' property.
+        """
+        board_size = [int(txt) for txt in self.properties["SZ"][0].split(":")]
+        if len(board_size) == 1:
+            board_size *= 2
+        return board_size
     
 
 def parse(input):

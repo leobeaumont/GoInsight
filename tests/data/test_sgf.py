@@ -124,28 +124,24 @@ def test_multi_child_serialization():
     assert "(;B[aa])(;W[bb])" in sgf_str
 
 
-@pytest.mark.parametrize("tree,expected", [
+@pytest.mark.parametrize("tree, expected", [
     (
-        SgfTree({"B": ["aa"]}, [SgfTree({"W": ["bb"]}, [SgfTree({"B": ["cc"]})])]),
-        ["B AA", "W BB", "B CC"]
+        SgfTree({"RU": "japanese", "SZ": "19","KM": "6.5", "B": ["aa"]}, # Tree
+                [SgfTree({"W": ["bb"]}, [SgfTree({"B": ["cc"]})])] # Children
+        ),
+
+        ["B aa", "W bb", "B cc"] # Expected
     ),
     (
-        SgfTree({"B": ["dd"]}),
-        ["B DD"]
+        SgfTree({"RU": "japanese", "SZ": "19","KM": "6.5", "B": ["dd"]}), # Tree
+
+        ["B dd"] # Expected
     ),
 ])
 def test_move_sequence(tree, expected):
     """
     Test SGF move sequence extraction in GTP format.
     """
-    # Minimal mock of Move.sgf_to_gtp so we don't depend on the Move module
-    import src.data.sgf as sgf
-    class DummyMove:
-        @staticmethod
-        def sgf_to_gtp(move_list):
-            return move_list[0].upper()
-    sgf.Move = DummyMove  # temporarily inject dummy
-
     result = tree.move_sequence(list_separated=False)
     assert result == expected
 
