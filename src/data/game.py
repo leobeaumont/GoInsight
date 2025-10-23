@@ -115,32 +115,38 @@ class Game:
         pass
     
     @overload
-    def place(self, color: str, pos: Tuple[int, int]):
-        """
-        Place a stone with the chosen color and coordinates.
-
-        Args:
-            color (str): Color of the stone.
-            pos (Tuple[int, int]): Coordinates of the stone.
-
-        Raises:
-            ValueError: If the coordinates is invalid.
-        """
-        ...
+    def place(self, color: str, pos: Tuple[int, int]): ...
 
     @overload
-    def place(self, color: str, pos: List[Tuple[int, int]]):
-        """
-        Place stones with the chosen color and coordinates.
-
-        Args:
-            color (str): Color of the stone.
-            pos (List[Tuple[int, int]]): List of coordinates of the stones.
-
-        Raises:
-            ValueError: If one of the coordinates is invalid.
-        """
-        ...
+    def place(self, color: str, pos: List[Tuple[int, int]]): ...
     
     def place(self, color: str, pos: Union[Tuple[int, int], List[Tuple[int, int]]]):
-        pass
+        """
+        Place one or more stones on the board without registering a move.
+
+        Args:
+            color (str): Color of the stone(s).
+            pos (Tuple[int, int] | List[Tuple[int, int]]): Coordinates of the stone(s).
+
+        Raises:
+            ValueError: If the coordinates are invalid.
+        """
+        if isinstance(pos, tuple):
+            #TODO
+            pass
+        elif isinstance(pos, list):
+            #TODO
+            pass
+        else:
+            raise ValueError(f"Game.place -- Invalid argument pos: {pos}")
+        
+
+    def play(self, move: str):
+        """
+        Play a move.
+
+        Args:
+            move (str): Move in the GTP format (e.g.: 'W A19').
+        """
+        # A finir quand on aura codé le Board !
+        self.moves.append(move)
