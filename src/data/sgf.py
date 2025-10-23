@@ -11,8 +11,9 @@ Modules:
 """
 
 import os
-from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
-from .constants import VALID_COLUMN
+
+from typing import Dict, List, Optional, TYPE_CHECKING, Union
+
 if TYPE_CHECKING:
     from .game import Game
 
@@ -129,45 +130,43 @@ class SgfTree:
 
         return sgf_string
     
-    def to_gtp_move_list(self) -> List[List[str]]:
-        """Convert the moves in this SgfTree to a list of GTP-formatted moves.
-        Returns:
-            list: A list of moves in GTP format, where each move is represented as ["color", "position"] (e.g., ["B", "A18"]).
-        """
-        moves = []
-        current_node = self
-        while current_node:
-            if 'B' in current_node.properties:
-                sgf_move = current_node.properties['B'][0]
-                gtp_move = self.sgf_to_gtp(sgf_move)
-                moves.append(["B", gtp_move])
-            elif 'W' in current_node.properties:
-                sgf_move = current_node.properties['W'][0]
-                gtp_move = self.sgf_to_gtp(sgf_move)
-                moves.append(["W", gtp_move])
-            if current_node.children:
-                current_node = current_node.children[0]
-            else:
-                break
-        return moves
+    def move_sequence(self, list_separated: bool = False) -> Union[List[str], List[List[str]]]:
+        """Obtain the sequence of moves from the tree.
 
-    def sgf_to_gtp(self, sgf_pos: str) -> str:
-        """Convert an SGF position to GTP format.
+        This method generates a list of moves in the GTP format.
 
         Args:
-            sgf_pos (str): The position in SGF format (e.g., 'ab', 'ip', ...).
+            list_separated (bool, optional): If true, the color and the GTP coordinates are inserted into a list. Default to False. 
 
         Returns:
-            str: The position in GTP format (e.g., "A18", "J4", ...).
+            (Union[List[str], List[List[str]]]): Sequence of move.
+
+        Examples:
+            With list_separated = False:
+                tree.move_sequence(list_separated=False) = ["W A19", "B B18", "W pass"]
+
+            With list_separated = True:
+                tree.move_sequence(list_separated=True) =  [["W", "A19"], ["B", "B18"], ["W", "pass"]]
         """
-        if sgf_pos == '':
-            return "pass"
-        alphabet = 'abcdefghijklmnopqrstuvwxyz'
-        index_col = alphabet.index(sgf_pos[0])
-        col = VALID_COLUMN[index_col]
-        inversed_row_index = alphabet.index(sgf_pos[1])
-        row = str(19 - inversed_row_index)
-        return  f"{col}{row}"
+        from .move import Move
+
+        sequence: List[str] = list()
+        current_node: SgfTree = self
+
+        while current_node:
+            for color in ("B", "W"):
+                move = current_node.properties.get(color)
+                if move:
+                    gtp_move = f"{color} {Move.sgf_to_gtp(move)}"
+                    if list_separated:
+                        gtp_move = gtp_move.split(" ")
+                    sequence.append()
+                    break  # there can't be a white move if there is already a black move
+
+            current_node = current_node.children[0] if current_node.children else None
+
+        return sequence
+
         
 def parse(input):
     """Parse an SGF string into an SgfTree object.

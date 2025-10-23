@@ -11,6 +11,7 @@ Modules:
 """
 
 from typing import List, Optional, Tuple, Union, overload
+from .board import Board
 from .move import Move
 from .sgf import SgfTree
 
@@ -28,9 +29,11 @@ class Game:
 
     Attributes:
         ruleset (str): Ruleset (e.g.: Japanese).
-        size (Tuple[int, int]): Size of the board, non-square boards are supported.
+        size (Tuple[int, int]): Width and height of the board, non-square boards are supported.
         komi (float): Komi.
         handicap (int): Number of handicap stones given to Black.
+        board (Board): Board of the game, used to store board states.
+        moves (List[str]): Sequence of moves in GTP format (e.g.: ["W A19", "B B18", "W pass"])
 
     Methods:
         from_sgftree(SgfTree): Create a Game object from an SgfTree.
@@ -46,6 +49,7 @@ class Game:
         AW: Optional[List[str]] = None,
         **kwargs
     ):
+        # Initialisation attributes
         self.ruleset: str = RU[0]
          
         size = [int(txt) for txt in SZ[0].split(":")]
@@ -57,11 +61,16 @@ class Game:
 
         self.handicap: int = int(HA[0])
 
+        # Variable/storage attributes
+        self.board: Board = Board(self, size)
+        self.moves: List[Move] = list()
+
+        # Board setup
         if AB:
-            self.place("black", [Move.gtp_to_coord(gtp_pos) for gtp_pos in AB])
+            self.place("black", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AB])
         
         if AW:
-            self.place("white", [Move.gtp_to_coord(gtp_pos) for gtp_pos in AW])
+            self.place("white", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AW])
     
     @classmethod
     def from_sgftree(cls, tree: SgfTree) -> "Game":
@@ -77,16 +86,21 @@ class Game:
         root_properties = tree.properties
         game = Game(**root_properties)
 
+        game.moves.extend(tree.move_sequence())
+        # A finir: il faut update le board avec la sequence de coups
+
     def next_color(self) -> str:
         """
         Tells if it is black's or white's turn.
 
         Returns:
-            (str): 'b' for black and 'w' for white.
+            (str): 'B' for black and 'W' for white.
         """
         # Notes: by default black start the game
         # If black has bonus stones to handicap white, white start the game. Except if black has only one bonus stone, then black starts the game.
-        pass
+        if not self.moves:
+            return "B" if self.handicap < 2 else "W"
+        return "BW"[self.moves[-1][0] == "B"] # Returns 'W' if last move is 'B' and 'B' otherwise.
 
     def is_valid_pos(self, pos: Tuple[int, int]) -> bool:
         """
@@ -101,32 +115,38 @@ class Game:
         pass
     
     @overload
-    def place(self, color: str, pos: Tuple[int, int]):
-        """
-        Place a stone with the chosen color and coordinates.
-
-        Args:
-            color (str): Color of the stone.
-            pos (Tuple[int, int]): Coordinates of the stone.
-
-        Raises:
-            ValueError: If the coordinates is invalid.
-        """
-        ...
+    def place(self, color: str, pos: Tuple[int, int]): ...
 
     @overload
-    def place(self, color: str, pos: List[Tuple[int, int]]):
-        """
-        Place stones with the chosen color and coordinates.
-
-        Args:
-            color (str): Color of the stone.
-            pos (List[Tuple[int, int]]): List of coordinates of the stones.
-
-        Raises:
-            ValueError: If one of the coordinates is invalid.
-        """
-        ...
+    def place(self, color: str, pos: List[Tuple[int, int]]): ...
     
     def place(self, color: str, pos: Union[Tuple[int, int], List[Tuple[int, int]]]):
-        pass
+        """
+        Place one or more stones on the board without registering a move.
+
+        Args:
+            color (str): Color of the stone(s).
+            pos (Tuple[int, int] | List[Tuple[int, int]]): Coordinates of the stone(s).
+
+        Raises:
+            ValueError: If the coordinates are invalid.
+        """
+        if isinstance(pos, tuple):
+            #TODO
+            pass
+        elif isinstance(pos, list):
+            #TODO
+            pass
+        else:
+            raise ValueError(f"Game.place -- Invalid argument pos: {pos}")
+        
+
+    def play(self, move: str):
+        """
+        Play a move.
+
+        Args:
+            move (str): Move in the GTP format (e.g.: 'W A19').
+        """
+        # A finir quand on aura codé le Board !
+        self.moves.append(move)
