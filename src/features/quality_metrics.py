@@ -46,6 +46,7 @@ def katago_analysis(tree: SgfTree):
     "-config", config_path
     ]
 
+    # À PARTIR D'ICI JE N'AI PAS REVIEW
     with open(path_input, "r") as infile, open(path_output, "w") as outfile:
         subprocess.run(command, stdin=infile, stdout=outfile)
 
