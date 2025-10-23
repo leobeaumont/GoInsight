@@ -122,3 +122,88 @@ def test_multi_child_serialization():
 
     sgf_str = serialize(root)
     assert "(;B[aa])(;W[bb])" in sgf_str
+
+
+@pytest.mark.parametrize("tree,expected", [
+    (
+        SgfTree({"B": ["aa"]}, [SgfTree({"W": ["bb"]}, [SgfTree({"B": ["cc"]})])]),
+        ["B AA", "W BB", "B CC"]
+    ),
+    (
+        SgfTree({"B": ["dd"]}),
+        ["B DD"]
+    ),
+])
+def test_move_sequence(tree, expected):
+    """
+    Test SGF move sequence extraction in GTP format.
+    """
+    # Minimal mock of Move.sgf_to_gtp so we don't depend on the Move module
+    import src.data.sgf as sgf
+    class DummyMove:
+        @staticmethod
+        def sgf_to_gtp(move_list):
+            return move_list[0].upper()
+    sgf.Move = DummyMove  # temporarily inject dummy
+
+    result = tree.move_sequence(list_separated=False)
+    assert result == expected
+
+
+@pytest.mark.parametrize("tree,expected", [
+    (
+        SgfTree({"B": ["aa"]}, [SgfTree({"W": ["pass"]})]),
+        [["B", "AA"], ["W", "PASS"]]
+    ),
+    (
+        SgfTree({"W": ["tt"]}),
+        [["W", "TT"]]
+    ),
+])
+def test_move_sequence_list_separated(tree, expected):
+    """
+    Test SGF move sequence extraction with list_separated=True.
+    """
+    import src.data.sgf as sgf
+    class DummyMove:
+        @staticmethod
+        def sgf_to_gtp(move_list):
+            return move_list[0].upper()
+    sgf.Move = DummyMove
+
+    result = tree.move_sequence(list_separated=True)
+    assert result == expected
+
+
+@pytest.mark.parametrize("tree", [
+    SgfTree({"C": ["no moves"]}),
+    SgfTree(),
+])
+def test_move_sequence_empty(tree):
+    """
+    Test that move_sequence returns an empty list for trees without moves.
+    """
+    import src.data.sgf as sgf
+    sgf.Move = type("Dummy", (), {"sgf_to_gtp": staticmethod(lambda x: x)})
+    assert tree.move_sequence() == []
+
+
+@pytest.mark.parametrize("dummy_game", [
+    type("DummyGame", (), {
+        "to_sgftree": lambda self: SgfTree({"C": ["dummy"]}),
+        "from_sgftree": staticmethod(lambda tree: f"Game from {tree.properties}")
+    })()
+])
+def test_from_game_and_to_game(dummy_game):
+    """
+    Test from_game and to_game delegation to Game methods.
+    """
+    import src.data.sgf as sgf
+    sgf.Game = type(dummy_game)
+
+    tree = SgfTree.from_game(dummy_game)
+    assert isinstance(tree, SgfTree)
+    assert tree.properties == {"C": ["dummy"]}
+
+    result = tree.to_game()
+    assert result == "Game from {'C': ['dummy']}"
