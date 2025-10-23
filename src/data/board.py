@@ -11,7 +11,7 @@ Modules:
 """
 
 from typing import Optional, Tuple, TYPE_CHECKING
-from .constants import VALID_COLUMN
+from .constants import VALID_COLUMN_GTP
 
 if TYPE_CHECKING:
     from .game import Game

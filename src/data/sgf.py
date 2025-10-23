@@ -128,7 +128,33 @@ class SgfTree:
                 file.write(sgf_string)
 
         return sgf_string
+    
+    def move_sequence(self) -> List[str]:
+        """Obtain the sequence of moves from the tree.
 
+        This method generates a list of moves in the GTP format.
+
+        Returns:
+            (List[str]): Sequence of move.
+        """
+        from .move import Move
+
+        sequence: List[str] = list()
+        current_node: SgfTree = self
+
+        while current_node:
+            for color in ("B", "W"):
+                move = current_node.properties.get(color)
+                if move:
+                    sequence.append(f"{color} {Move.sgf_to_gtp(move)}")
+                    break  # there can't be a white move if there is already a black move
+
+            current_node = current_node.children[0] if current_node.children else None
+
+        return sequence
+    
+    def to_gtp_move_list(self) -> List[List[str]]:
+        pass
 
 def parse(input):
     """Parse an SGF string into an SgfTree object.

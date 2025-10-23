@@ -11,7 +11,7 @@ Modules:
 """
 
 from typing import Optional, Tuple, TYPE_CHECKING
-from .constants import VALID_COLUMN
+from .constants import VALID_COLUMN_GTP, VALID_COLUMN_SGF
 
 if TYPE_CHECKING:
     from .game import Game
@@ -32,7 +32,7 @@ class Move:
         game (Game): The game to play the move on.
         turn (int): Turn on which the move is played (starts at 0).
         color (str): Color playing the move ('b' for black and 'w' for white).
-        pos (Tuple[int, int]): Coordinates on board (first coord is left to right, second coord is bottom to top).
+        pos (Tuple[int, int]): Coordinates on board (first coord is left to right, second coord is top to bottom and both starts at 0).
 
     Methods:
         to_gtp(): Export move to the gtp format.
@@ -57,17 +57,39 @@ class Move:
         self.pos = pos
 
     @classmethod
-    def sgf_to_coord(cls, sgf_pos: str) -> Tuple[int, int]:
+    def sgf_to_coord(cls, sgf_pos: str) -> Optional[Tuple[int, int]]:
         """
-        Translate sgf coordinate format to a simple coordinates.
+        Translate SGF coordinate format to a simple coordinates.
 
         Args:
             sgf_pos (str): Coordinates in the SGF format.
 
-        Return:
-            (Tuple[int, int]): The corresponding coordinates.
+        Returns:
+            (Tuple[int, int], optional): The corresponding coordinates.
         """
-        pass
+        if sgf_pos == "":
+            return None
+        return (VALID_COLUMN_SGF.index(sgf_pos[0]), VALID_COLUMN_SGF.index(sgf_pos[1]))
+    
+    @classmethod
+    def sgf_to_gtp(cls, sgf_pos: str, board_size: Tuple[int, int]) -> str:
+        """
+        Translate SGF coordinate format to GTP coordinate format.
+
+        Args:
+            sgf_pos (str): Coordinates in the SGF format.
+
+        Returns:
+            (str): The corresponding position in GTP format ('pass' if sgf_pos is empty).
+        """
+        coords = Move.sgf_to_coord(sgf_pos)
+
+        if coords is None:
+            return "pass"
+        
+        col = VALID_COLUMN_GTP[coords[0]]
+        line = str(board_size[1] - coords[1])
+        return col + line
 
     def to_gtp(self) -> str:
         """
@@ -81,8 +103,8 @@ class Move:
         if self.pos is None:
             play = "pass"
         else:
-            col = VALID_COLUMN[self.pos[0]]
-            line = str(self.pos[1] + 1)
+            col = VALID_COLUMN_GTP[self.pos[0]]
+            line = str(self.game.size[1] - self.pos[1])
             play = col + line
         
         out += " " + play
