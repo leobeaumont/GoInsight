@@ -3,30 +3,34 @@ import json
 import os
 import platform
 import subprocess
-from ..data.sgf import SgfTree
+
+from .constants import LINUX_MODEL_PATH, MACOS_MODEL_PATH, WINDOWS_MODEL_PATH
+from ..data import SgfTree
 
 def katago_analysis(tree: SgfTree):
     """
     This function performs an analysis of a Go game position using KataGo and returns the score lead and candidate moves.
     It creates an input file for KataGo, runs the analysis, reads the output file, and extracts the score lead from the results.
+
     Args:
         tree (SgfTree): The SGF tree representing the game position to analyze.
+
     Returns:
         float: The score lead at the current position.
         list: A list of candidate moves.
         float: The win probability at the current position.
     """
     if platform.system() == "Darwin":
-        model_path="/opt/homebrew/share/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
+        model_path = MACOS_MODEL_PATH
     elif platform.system() == "Linux":
-        model_path="/model/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
+        model_path = LINUX_MODEL_PATH
     else:
-        model_path="C:\\katago\\kata1-b18c384nbt-s9996604416-d4316597426.bin.gz" #WINDOWS À CHANGER
+        model_path = WINDOWS_MODEL_PATH
         
     path_input = "games/analysis_input.txt"
     path_output = "analysis_output.json"
     config_path = "analysis.cfg"
-    moves_list = json.dumps(tree.to_gtp_move_list())
+    moves_list = json.dumps(tree.move_sequence(insert_tuple=True))
 
     json_text = f'{{"id":"pos1","moves":{moves_list},"rules":"japanese","komi":7.5,"boardXSize":19,"boardYSize":19,"maxVisits":100}}'
 
@@ -34,6 +38,7 @@ def katago_analysis(tree: SgfTree):
         f.write(json_text + "\n")
 
     #We perform the analysis with Katago
+    # /!\ LA COMMANDE N'EST PAS LA MÊME EN FONCTION DE L'OS, À CHANGER
     command = [
     "katago",
     "analysis",

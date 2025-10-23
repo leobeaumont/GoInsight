@@ -12,7 +12,7 @@ Modules:
 
 import os
 
-from typing import Dict, List, Optional, TYPE_CHECKING, Union
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from .game import Game
@@ -130,23 +130,22 @@ class SgfTree:
 
         return sgf_string
     
-    def move_sequence(self, list_separated: bool = False) -> Union[List[str], List[List[str]]]:
+    def move_sequence(self, insert_tuple: bool = False) -> Union[List[str], List[Tuple[str, str]]]:
         """Obtain the sequence of moves from the tree.
 
         This method generates a list of moves in the GTP format.
 
         Args:
-            list_separated (bool, optional): If true, the color and the GTP coordinates are inserted into a list. Default to False. 
+            insert_tuple (bool, optional): If true, the color and the GTP coordinates are inserted into a tuple. Default to False. 
 
         Returns:
-            (Union[List[str], List[List[str]]]): Sequence of move.
+            (Union[List[str], List[Tuple[str, str]]]): Sequence of move.
 
         Examples:
-            With list_separated = False:
-                tree.move_sequence(list_separated=False) = ["W A19", "B B18", "W pass"]
-
-            With list_separated = True:
-                tree.move_sequence(list_separated=True) =  [["W", "A19"], ["B", "B18"], ["W", "pass"]]
+            With insert_tuple = False:
+                tree.move_sequence(insert_tuple=False) = ["W A19", "B B18", "W pass"]
+            With insert_tuple = True:
+                tree.move_sequence(insert_tuple=True) =  [("W", "A19"), ("B", "B18"), ("W", "pass")]
         """
         from .move import Move
 
@@ -158,8 +157,8 @@ class SgfTree:
                 move = current_node.properties.get(color)
                 if move:
                     gtp_move = f"{color} {Move.sgf_to_gtp(move)}"
-                    if list_separated:
-                        gtp_move = gtp_move.split(" ")
+                    if insert_tuple:
+                        gtp_move = tuple(gtp_move.split(" "))
                     sequence.append()
                     break  # there can't be a white move if there is already a black move
 
