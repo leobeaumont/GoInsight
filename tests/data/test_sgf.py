@@ -126,48 +126,45 @@ def test_multi_child_serialization():
 
 @pytest.mark.parametrize("tree, expected", [
     (
-        SgfTree({"RU": "japanese", "SZ": "19","KM": "6.5", "B": ["aa"]}, # Tree
-                [SgfTree({"W": ["bb"]}, [SgfTree({"B": ["cc"]})])] # Children
+        SgfTree({"RU": ["japanese"], "SZ": ["19"], "KM": ["6.5"], "B": ["aa"]}, # Tree root
+                [SgfTree({"W": ["bb"]}, # Child 1
+                [SgfTree({"B": ["cc"]})])] # Child 2
         ),
 
-        ["B aa", "W bb", "B cc"] # Expected
+        ["B A19", "W B18", "B C17"] # Expected
     ),
     (
-        SgfTree({"RU": "japanese", "SZ": "19","KM": "6.5", "B": ["dd"]}), # Tree
+        SgfTree({"RU": ["japanese"], "SZ": ["19"], "KM": ["6.5"], "B": ["dd"]}), # Tree
 
-        ["B dd"] # Expected
+        ["B D16"] # Expected
     ),
 ])
 def test_move_sequence(tree, expected):
     """
     Test SGF move sequence extraction in GTP format.
     """
-    result = tree.move_sequence(list_separated=False)
+    result = tree.move_sequence(insert_tuple=False)
     assert result == expected
 
 
-@pytest.mark.parametrize("tree,expected", [
+@pytest.mark.parametrize("tree, expected", [
     (
-        SgfTree({"B": ["aa"]}, [SgfTree({"W": ["pass"]})]),
-        [["B", "AA"], ["W", "PASS"]]
+        SgfTree({"RU": ["japanese"], "SZ": ["19"], "KM": ["6.5"], "B": ["aa"]}, # Root
+        [SgfTree({"W": [""]})]), # Child 1
+
+        [("B", "A19"), ("W", "pass")] # Expected
     ),
     (
-        SgfTree({"W": ["tt"]}),
-        [["W", "TT"]]
+        SgfTree({"RU": ["japanese"], "SZ": ["19"], "KM": ["6.5"], "W": ["tt"]}), # Root
+
+        [("W", "U0")] # Expected
     ),
 ])
 def test_move_sequence_list_separated(tree, expected):
     """
     Test SGF move sequence extraction with list_separated=True.
     """
-    import src.data.sgf as sgf
-    class DummyMove:
-        @staticmethod
-        def sgf_to_gtp(move_list):
-            return move_list[0].upper()
-    sgf.Move = DummyMove
-
-    result = tree.move_sequence(list_separated=True)
+    result = tree.move_sequence(insert_tuple=True)
     assert result == expected
 
 
