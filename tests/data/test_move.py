@@ -4,6 +4,7 @@ from src.data import Move
 class FakeGame:
     def __init__(self, raise_error: bool):
         self.raise_error = raise_error
+        self.size = (19, 19)
 
     def is_valid_pos(self, pos):
         return not self.raise_error
