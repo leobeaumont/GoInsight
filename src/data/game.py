@@ -10,7 +10,7 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import List, Optional, Tuple, Union, overload
+from typing import List, Optional, overload, Tuple, Union
 from .board import Board
 from .move import Move
 from .sgf import SgfTree

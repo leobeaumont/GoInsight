@@ -130,12 +130,13 @@ class SgfTree:
 
         return sgf_string
     
-    def move_sequence(self, insert_tuple: bool = False) -> Union[List[str], List[Tuple[str, str]]]:
+    def move_sequence(self, board_size: Optional[Tuple[int, int]] = None, insert_tuple: bool = False) -> Union[List[str], List[Tuple[str, str]]]:
         """Obtain the sequence of moves from the tree.
 
         This method generates a list of moves in the GTP format.
 
         Args:
+            board_size (Tuple[int, int], optional): Size of the board. If not provided, it is fetched from the tree.
             insert_tuple (bool, optional): If true, the color and the GTP coordinates are inserted into a tuple. Default to False. 
 
         Returns:
@@ -156,15 +157,39 @@ class SgfTree:
             for color in ("B", "W"):
                 move = current_node.properties.get(color)
                 if move:
-                    gtp_move = f"{color} {Move.sgf_to_gtp(move)}"
+                    if board_size is None:
+                        board_size = self.get_board_size()
+
+                    gtp_move = f"{color} {Move.sgf_to_gtp(move[0], board_size)}"
                     if insert_tuple:
                         gtp_move = tuple(gtp_move.split(" "))
-                    sequence.append()
+                    sequence.append(gtp_move)
+
                     break  # there can't be a white move if there is already a black move
 
             current_node = current_node.children[0] if current_node.children else None
 
         return sequence
+    
+    def get_board_size(self) -> Tuple[int, int]:
+        """ Fetch the board size from the properties of the root
+
+        Returns:
+            (Tuple[int, int]): The size of the board.
+
+        Raises:
+            KeyError: If the root of the tree doesn't have a 'SZ' property.
+            ValueError: If the board size is invalid.
+        """
+        from .constants import MAX_BOARD_SIZE
+
+        board_size = [int(txt) for txt in self.properties["SZ"][0].split(":")]
+
+        if board_size[0] < 0 or board_size[0] > MAX_BOARD_SIZE:
+            raise ValueError(f"SgfTree.get_board_size() -- Invalid board size: {board_size[0]}")
+        if len(board_size) == 1:
+            board_size *= 2
+        return tuple(board_size)
 
         
 def parse(input):
