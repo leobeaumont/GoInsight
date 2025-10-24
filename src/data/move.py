@@ -66,6 +66,9 @@ class Move:
 
         Returns:
             (Tuple[int, int], optional): The corresponding coordinates.
+        
+        Raises:
+            ValueError: If the sgf position has an invalid character.
         """
         if sgf_pos == "":
             return None

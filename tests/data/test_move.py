@@ -55,3 +55,61 @@ def test_to_gtp(kwargs):
     assert gtp_move[1] == ' '
     assert gtp_move[2] in "ABCDEFGHJKLMNOPQRSTUVWXYZ" or gtp_move[2:] == "pass"
     assert gtp_move[3] in "123456789" or gtp_move[2:] == "pass"
+
+@pytest.mark.parametrize("sgf_pos, expected_coord", [
+    (
+        "",
+        None
+    ),
+    (
+        "aa",
+        (0, 0)
+    ),
+    (
+        "ab",
+        (0, 1)
+    )
+])
+def test_sgf_to_coord(sgf_pos, expected_coord):
+    """
+    Tests the translation of an sgf position into coordinates.
+    """
+    assert Move.sgf_to_coord(sgf_pos) == expected_coord
+
+
+@pytest.mark.parametrize("sgf_pos", [
+    "  ",
+    "!!",
+    "A19"
+])
+def test_error_sgf_to_coord(sgf_pos):
+    """
+    Tests the failcases of sgf_to_coord.
+    """
+    error = False
+    try:
+        Move.sgf_to_coord(sgf_pos)
+    except ValueError:
+        error = True
+    assert error
+
+
+@pytest.mark.parametrize("sgf_pos, gtp_pos", [
+    (
+        "aa",
+        "A19"
+    ),
+    (
+        "tt",
+        "U0"
+    ),
+    (
+        "",
+        "pass"
+    )
+])
+def test_sgf_to_gtp(sgf_pos, gtp_pos):
+    """
+    tests the translation of an sgf position into a gtp position.
+    """
+    assert Move.sgf_to_gtp(sgf_pos, (19, 19)) == gtp_pos
