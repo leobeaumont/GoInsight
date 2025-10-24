@@ -149,9 +149,6 @@ class SgfTree:
         """
         from .move import Move
 
-        if board_size is None:
-            board_size = self.get_board_size()
-
         sequence: List[str] = list()
         current_node: SgfTree = self
 
@@ -159,10 +156,14 @@ class SgfTree:
             for color in ("B", "W"):
                 move = current_node.properties.get(color)
                 if move:
+                    if board_size is None:
+                        board_size = self.get_board_size()
+
                     gtp_move = f"{color} {Move.sgf_to_gtp(move[0], board_size)}"
                     if insert_tuple:
                         gtp_move = tuple(gtp_move.split(" "))
                     sequence.append(gtp_move)
+
                     break  # there can't be a white move if there is already a black move
 
             current_node = current_node.children[0] if current_node.children else None
@@ -177,8 +178,14 @@ class SgfTree:
 
         Raises:
             KeyError: If the root of the tree doesn't have a 'SZ' property.
+            ValueError: If the board size is invalid.
         """
+        from .constants import MAX_BOARD_SIZE
+
         board_size = [int(txt) for txt in self.properties["SZ"][0].split(":")]
+
+        if board_size[0] < 0 or board_size[0] > MAX_BOARD_SIZE:
+            raise ValueError(f"SgfTree.get_board_size() -- Invalid board size: {board_size[0]}")
         if len(board_size) == 1:
             board_size *= 2
         return tuple(board_size)

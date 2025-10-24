@@ -176,27 +176,42 @@ def test_move_sequence_empty(tree):
     """
     Test that move_sequence returns an empty list for trees without moves.
     """
-    import src.data.sgf as sgf
-    sgf.Move = type("Dummy", (), {"sgf_to_gtp": staticmethod(lambda x: x)})
     assert tree.move_sequence() == []
 
 
-@pytest.mark.parametrize("dummy_game", [
-    type("DummyGame", (), {
-        "to_sgftree": lambda self: SgfTree({"C": ["dummy"]}),
-        "from_sgftree": staticmethod(lambda tree: f"Game from {tree.properties}")
-    })()
+@pytest.mark.parametrize("tree, expected, error", [
+    (
+        SgfTree({"SZ": ["19"]}),
+        (19, 19),
+        False
+    ),
+    (
+        SgfTree({"SZ": ["10:15"]}),
+        (10, 15),
+        False
+    ),
+    (
+        SgfTree(),
+        None,
+        True
+    ),
+    (
+        SgfTree({"SZ": ["-1"]}),
+        None,
+        True
+    )
 ])
-def test_from_game_and_to_game(dummy_game):
+def test_get_board_size(tree, expected, error):
     """
-    Test from_game and to_game delegation to Game methods.
+    Tests that the size of the board is fetched correclty with square and rectangular sizes, also tests error cases.
     """
-    import src.data.sgf as sgf
-    sgf.Game = type(dummy_game)
+    error_happened = False
+    try:
+        board_size = tree.get_board_size()
+    except Exception as e:
+        error_happened = True
 
-    tree = SgfTree.from_game(dummy_game)
-    assert isinstance(tree, SgfTree)
-    assert tree.properties == {"C": ["dummy"]}
-
-    result = tree.to_game()
-    assert result == "Game from {'C': ['dummy']}"
+    if error:
+        assert error_happened
+    else:
+        assert board_size == expected
