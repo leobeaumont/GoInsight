@@ -4,8 +4,8 @@ import os
 import platform
 import subprocess
 
-from .constants import LINUX_MODEL_PATH, MACOS_MODEL_PATH, WINDOWS_MODEL_PATH
 from ..data import SgfTree
+from .constants import ANALYSIS_CONFIG_PATH, MODEL_DIR, NEURALNET_PATH
 
 def katago_analysis(tree: SgfTree):
     """
@@ -20,51 +20,53 @@ def katago_analysis(tree: SgfTree):
         list: A list of candidate moves.
         float: The win probability at the current position.
     """
+    # Katago selection depending on OS
     if platform.system() == "Darwin":
-        model_path = MACOS_MODEL_PATH
+        model = "katago"
     elif platform.system() == "Linux":
-        model_path = LINUX_MODEL_PATH
+        model = "/".join([MODEL_DIR, "katago"])
     else:
-        model_path = WINDOWS_MODEL_PATH
-        
-    path_input = "games/analysis_input.txt"
-    path_output = "analysis_output.json"
-    config_path = "analysis.cfg"
-    moves_list = json.dumps(tree.move_sequence(insert_tuple=True))
+        model = "/".join([MODEL_DIR, "katago.exe"])
 
-    json_text = f'{{"id":"pos1","moves":{moves_list},"rules":"japanese","komi":7.5,"boardXSize":19,"boardYSize":19,"maxVisits":100}}'
+    # Obtaining move sequence from SGF tree
+    moves_list = tree.move_sequence(insert_tuple=True)
 
-    with open(path_input, "w") as f:
-        f.write(json_text + "\n")
+    # Building input json
+    json_input = {
+        "id":"pos1",
+        "moves": moves_list,
+        "rules":"japanese",
+        "komi":7.5,
+        "boardXSize":19,
+        "boardYSize":19,
+        "maxVisits":100
+    }
 
-    #We perform the analysis with Katago
-    # /!\ LA COMMANDE N'EST PAS LA MÊME EN FONCTION DE L'OS, À CHANGER
+    # Command declaration
     command = [
-    "katago",
+    model,
     "analysis",
-    "-model", model_path,
-    "-config", config_path
+    "-model", NEURALNET_PATH,
+    "-config", ANALYSIS_CONFIG_PATH
     ]
 
-    # À PARTIR D'ICI JE N'AI PAS REVIEW
-    with open(path_input, "r") as infile, open(path_output, "w") as outfile:
-        subprocess.run(command, stdin=infile, stdout=outfile)
+    # Running the command
+    process = subprocess.run(
+        command,
+        input=json.dumps(json_input) + "\n",
+        capture_output=True,
+        text=True,
+        check=True,
+    )
 
-    if os.path.exists(path_input): #We delete the analysis_input.txt file
-        os.remove(path_input)
+    # Capturing output
+    output_lines = [line for line in process.stdout.splitlines() if line.strip()]
+    output_data = json.loads(output_lines[-1])
 
-    with open(path_output, "r") as f: #Read the analysis_output.json file
-        txt = f.read()
-    output_data = json.loads(txt) 
-
-    #Extraction of data from the JSON text
-
+    # Extracting data from the JSON
     scoreLead = output_data["rootInfo"]["scoreLead"] 
     candidate_moves = {move["move"]: move["scoreLead"] for move in output_data["moveInfos"]}
     winrate = output_data["rootInfo"]["winrate"]
-
-    if os.path.exists(path_output):
-        os.remove(path_output) #We delete the analysis_output.json file
 
     return scoreLead, candidate_moves, winrate
 
@@ -148,7 +150,7 @@ def analyse_game(tree: SgfTree):
 if __name__ == "__main__":
     from src.data.sgf import SgfTree
     # Création de l'arbre racine
-    test_game = SgfTree()
+    test_game = SgfTree({"RU": ["japanese"], "KM": ["7.5"], "SZ": ["19"]})
     # On ajoute un coup noir puis blanc
     test_game.children.append(SgfTree({"B": ["dd"]}))
     test_game.children[0].children.append(SgfTree({"W": ["pp"]}))

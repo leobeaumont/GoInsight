@@ -1,5 +1,6 @@
-MACOS_MODEL_PATH = "/opt/homebrew/share/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
-LINUX_MODEL_PATH = "/model/katago/kata1-b18c384nbt-s9996604416-d4316597426.bin.gz"
-WINDOWS_MODEL_PATH = "C:\\katago\\kata1-b18c384nbt-s9996604416-d4316597426.bin.gz" #WINDOWS À CHANGER
+MODEL_DIR = "model"
 
+ANALYSIS_CONFIG_PATH = "/".join([MODEL_DIR, "analysis_example.cfg"])
 
+NEURALNET_DIR = "neuralnet"
+NEURALNET_PATH = "/".join([NEURALNET_DIR, "kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz"])
