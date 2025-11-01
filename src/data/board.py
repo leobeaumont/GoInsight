@@ -48,7 +48,7 @@ class Board:
 
 
     
-    def move_to_gtp(self) -> List[str]:
+    def list_move_to_gtp(self) -> List[str]:
         """
         Convert a list of Move objects to a list of moves in GTP format.
 
@@ -57,7 +57,8 @@ class Board:
         """
         board = []
         for i in self.sequence:
-            board.append(i.to_gtp())
+            if "pass" not in i.to_gtp:
+                board.append(i.to_gtp())
 
         return board
 
@@ -84,16 +85,38 @@ class Board:
                     return False
         return True
     
-    def sub_board(self, top_left: Tuple[int, int], bottom_right: Tuple[int, int]) -> np.ndarray:
+
+    
+    def sub_board(self, corners: Tuple[str, str]) -> "Board":
         """
         Extract a sub-board from the current board.
 
         Args:
-            top_left (Tuple[int, int]): Coordinates of the top-left corner of the sub-board.
-            bottom_right (Tuple[int, int]): Coordinates of the bottom-right corner of the sub-board.
+            corners (Tuple[str, str]): Top-left and bottom-right corners in GTP format (e.g.: ("D4", "K10")).
+
+        Returns:
+            (Board): The sub-board.
         """
 
+        rows = (min(VALID_COLUMN_GTP.index(corners[0][0]),VALID_COLUMN_GTP.index(corners[1][0])), max(VALID_COLUMN_GTP.index(corners[0][0]),VALID_COLUMN_GTP.index(corners[1][0])))
+        cols = (min(int(corners[0][1:]),int(corners[1][1:])),max(int(corners[0][1:]),int(corners[1][1:])))
 
+
+        new_size = (rows[1]-rows[0]+1, cols[1]-cols[0]+1)
+        moves_to_keep = []
+
+        moves_gtp = self.list_move_to_gtp()
+
+        for i in moves_gtp:
+            col = VALID_COLUMN_GTP.index(i[2])
+            row = int(i[3:])
+
+            if rows[0] <= col <= rows[1] and cols[0] <= row <= cols[1]:
+                moves_to_keep.append(i)
+        
+        sub_board = Board(self.game, new_size, moves_to_keep)
+
+        return sub_board
 
                 
             
