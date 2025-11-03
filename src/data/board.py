@@ -117,6 +117,34 @@ class Board:
         sub_board = Board(self.game, new_size, moves_to_keep)
 
         return sub_board
+    
+
+    def list_moves_sub_board(self, corners: Tuple[str, str]) -> List[str]:
+        """
+        Extract moves that are within a sub-board defined by the given corners.
+
+        Args:
+            corners (Tuple[str, str]): Top-left and bottom-right corners in GTP format (e.g.: ("D4", "K10")).
+
+        Returns:
+            List[str]: List of moves in GTP format within the sub-board.
+        """
+
+        rows = (min(VALID_COLUMN_GTP.index(corners[0][0]),VALID_COLUMN_GTP.index(corners[1][0])), max(VALID_COLUMN_GTP.index(corners[0][0]),VALID_COLUMN_GTP.index(corners[1][0])))
+        cols = (min(int(corners[0][1:]),int(corners[1][1:])),max(int(corners[0][1:]),int(corners[1][1:])))
+
+        moves_to_keep = []
+
+        moves_gtp = self.list_move_to_gtp()
+
+        for i in moves_gtp:
+            col = VALID_COLUMN_GTP.index(i[2])
+            row = int(i[3:])
+
+            if rows[0] <= col <= rows[1] and cols[0] <= row <= cols[1]:
+                moves_to_keep.append(i)
+        
+        return moves_to_keep
 
                 
             
