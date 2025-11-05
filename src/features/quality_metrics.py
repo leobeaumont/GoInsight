@@ -88,7 +88,7 @@ def rating_last_move(tree: SgfTree):
     """
     This function rates the last move played in a Go game position by comparing the score lead before and after the move using KataGo analysis.
     """
-    score_lead_after, _ = katago_analysis(tree)[0]
+    score_lead_after = katago_analysis(tree)[0]
     score_lead_before = katago_analysis(without_last_move(tree))[0]
     rate = score_lead_after / score_lead_before * 100 #Percentage of precision compared to the best move
     return rate
@@ -141,7 +141,7 @@ def analyse_game(tree: SgfTree):
     current_tree = deepcopy(tree)
     total_moves = count_moves(tree)
     for _ in range(total_moves):
-        scoreLead, winrate = analyze_last_move(current_tree)[0], analyze_last_move(current_tree)[2]
+        scoreLead, _, winrate = katago_analysis(current_tree)
         move_qualities.append([scoreLead, winrate])
         current_tree = without_last_move(current_tree)
     move_qualities.reverse()  # Reverse to match the original move order
@@ -155,6 +155,8 @@ if __name__ == "__main__":
     test_game.children.append(SgfTree({"B": ["dd"]}))
     test_game.children[0].children.append(SgfTree({"W": ["pp"]}))
     score_lead, candidate_moves, winrate = katago_analysis(test_game)
+    move_qualities = analyse_game(test_game)
+    print("Move Qualities:", move_qualities)
     print("Score Lead:", score_lead)
     print("Candidate Moves:", candidate_moves)
     print("Win Rate:", winrate)
