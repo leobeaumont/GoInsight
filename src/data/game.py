@@ -34,9 +34,6 @@ class Game:
         handicap (int): Number of handicap stones given to Black.
         board (Board): Board of the game, used to store board states.
         moves (List[str]): Sequence of moves in GTP format (e.g.: ["W A19", "B B18", "W pass"])
-
-    Methods:
-        from_sgftree(SgfTree): Create a Game object from an SgfTree.
     """
 
     def __init__(

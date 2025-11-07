@@ -33,9 +33,6 @@ class Move:
         turn (int): Turn on which the move is played (starts at 0).
         color (str): Color playing the move ('b' for black and 'w' for white).
         pos (Tuple[int, int]): Coordinates on board (first coord is left to right, second coord is top to bottom and both starts at 0).
-
-    Methods:
-        to_gtp(): Export move to the gtp format.
     """
 
     def __init__(

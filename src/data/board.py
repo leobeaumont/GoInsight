@@ -31,9 +31,6 @@ class Board:
         game (Game): Game associated to the board.
         size (Tuple[int, int]): Size of the board.
         board (List[List[Optional[Move]]]): Representation of the board.
-
-    Methods:
-        TO DO
     """
     def __init__(
         self,
