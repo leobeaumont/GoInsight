@@ -39,16 +39,16 @@ class Board:
         self,
         game: "Game",
         size: Optional[Tuple[int, int]] = (19, 19),
-        moves: Optional[List[Move]] = None
+        moves: Optional[List["Move"]] = None
     ):
         self.game = game
         self.size = size
 
         if moves is None:
             moves = self.game.moves
-        self.board: List[List[Optional[Move]]] = self.board_from_moves(moves)
+        self.board: List[List[Optional["Move"]]] = self.board_from_moves(moves)
 
-    def board_from_moves(self, moves: List[Move]) -> List[List[Optional[Move]]]:
+    def board_from_moves(self, moves: List["Move"]) -> List[List[Optional["Move"]]]:
         """
         Create a board representation from a list of moves.
 
@@ -112,8 +112,7 @@ class Board:
 
         return Board(self.game, size, moves)
     
-
-    def moves_sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> List[Move]:
+    def moves_sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> List["Move"]:
         """
         Extract moves that are within a sub-board defined by the given corners.
         Coordinate format is (x, y) starting at 0 and both corners are included in the selection.
@@ -136,5 +135,4 @@ class Board:
         for move in self.game.moves:
             x, y = move.pos
             if x_min <= x <= x_max and y_min <= y <= y_max:
-                kept_moves.append(move)      
-            
+                kept_moves.append(move)
