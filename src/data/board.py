@@ -25,126 +25,116 @@ class Board:
     Args:
         game (Game): Game associated to the board.
         size (Tuple[int, int], optional): Size of the board (default to 19x19).
-
-    Raises:
-        ValueError: If the size of the board is invalid.
+        moves (List[Move], optional): List of moves (if not provided, game moves are used).
 
     Attributes:
         game (Game): Game associated to the board.
         size (Tuple[int, int]): Size of the board.
+        board (List[List[Optional[Move]]]): Representation of the board.
 
     Methods:
         TO DO
     """
-
     def __init__(
         self,
         game: "Game",
-        size: Optional[Tuple[int, int]] = (19, 19)
+        size: Optional[Tuple[int, int]] = (19, 19),
+        moves: Optional[List[Move]] = None
     ):
         self.game = game
         self.size = size
-        self.sequence: List[Move] = None
 
+        if moves is None:
+            moves = self.game.moves
+        self.board: List[List[Optional[Move]]] = self.board_from_moves(moves)
 
-    
-    def list_move_to_gtp(self) -> List[str]:
+    def board_from_moves(self, moves: List[Move]) -> List[List[Optional[Move]]]:
         """
-        Convert a list of Move objects to a list of moves in GTP format.
+        Create a board representation from a list of moves.
+
+        Args:
+            moves (List[Move]): List of moves.
 
         Returns:
-            List[str]: List in GTP format (e.g.: ["B D4", "W pass"]).
+            List[List[Optional[Move]]]: Representation of the board.
+
+        Raises:
+            ValueError: If the moves provided countain an illegal sequence.
         """
-        board = []
-        for i in self.sequence:
-            if "pass" not in i.to_gtp:
-                board.append(i.to_gtp())
+        board = [[None] * self.size[0]] * self.size[1]
 
-        return board
+        for i, move in enumerate(moves):
+            if not self.is_valid_pos(move.pos):
+                raise ValueError(f"Board.board_from_moves(moves) -- Invalid position at index {i}: {move.pos}")
+            
+            x, y = move.pos
+            board[y][x] = move
 
-    def is_valid_pos(self, pos: List[str]) -> bool:
+        return board        
+
+    def is_valid_pos(self, pos: Tuple[int, int]) -> bool:
         """
         Check if a position is valid on the board.
 
         Args:
             pos (Tuple[int, int]): Coordinates on board (first coord is left to right, second coord is top to bottom and both starts at 0).
 
+        Returns:
+            bool: Wether the position is valid or not.
         """
-        columns = VALID_COLUMN_GTP[:self.size[0]]
-        rows = [str(i+1) for i in range(self.size[1])]
+        x, y = pos
+        x_size, y_size = self.size
 
-        for coord in pos:
-            if len(coord) < 4:
-                return False
-            if coord[0] not in ["W", "B"]:
-                return False
-            if coord[2:-1] != "pass":
-                if coord[2] not in columns:
-                    return False
-                if coord[3:] not in rows:
-                    return False
-        return True
+        if x >= x_size or y >= y_size:
+            return False
+        elif self.board[y][x] is not None:
+            return False
+        else:
+            return True
     
-
-    
-    def sub_board(self, corners: Tuple[str, str]) -> "Board":
+    def sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> "Board":
         """
         Extract a sub-board from the current board.
+        Coordinate format is (x, y) starting at 0 and both corners are included in the selection.
 
         Args:
-            corners (Tuple[str, str]): Top-left and bottom-right corners in GTP format (e.g.: ("D4", "K10")).
+            corner1 (Tuple[int, int]): Coordinate of area's first corner.
+            corner2 (Tuple[int, int]): Coordinate of area's second corner.
 
         Returns:
-            (Board): The sub-board.
+            Board: The sub-board.
         """
+        x_c1, y_c1 = corner1
+        x_c2, y_c2 = corner2
 
-        rows = (min(VALID_COLUMN_GTP.index(corners[0][0]),VALID_COLUMN_GTP.index(corners[1][0])), max(VALID_COLUMN_GTP.index(corners[0][0]),VALID_COLUMN_GTP.index(corners[1][0])))
-        cols = (min(int(corners[0][1:]),int(corners[1][1:])),max(int(corners[0][1:]),int(corners[1][1:])))
+        size = (abs(x_c1 - x_c2), abs(y_c1 - y_c2))
+        moves = self.moves_sub_board(corner1, corner2)
 
-
-        new_size = (rows[1]-rows[0]+1, cols[1]-cols[0]+1)
-        moves_to_keep = []
-
-        moves_gtp = self.list_move_to_gtp()
-
-        for i in moves_gtp:
-            col = VALID_COLUMN_GTP.index(i[2])
-            row = int(i[3:])
-
-            if rows[0] <= col <= rows[1] and cols[0] <= row <= cols[1]:
-                moves_to_keep.append(i)
-        
-        sub_board = Board(self.game, new_size, moves_to_keep)
-
-        return sub_board
+        return Board(self.game, size, moves)
     
 
-    def list_moves_sub_board(self, corners: Tuple[str, str]) -> List[str]:
+    def moves_sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> List[Move]:
         """
         Extract moves that are within a sub-board defined by the given corners.
+        Coordinate format is (x, y) starting at 0 and both corners are included in the selection.
 
         Args:
-            corners (Tuple[str, str]): Top-left and bottom-right corners in GTP format (e.g.: ("D4", "K10")).
+            corner1 (Tuple[int, int]): Coordinate of area's first corner.
+            corner2 (Tuple[int, int]): Coordinate of area's second corner.
 
         Returns:
-            List[str]: List of moves in GTP format within the sub-board.
+            List[Move]: List of moves within the sub-board.
         """
+        x_c1, y_c1 = corner1
+        x_c2, y_c2 = corner2
 
-        rows = (min(VALID_COLUMN_GTP.index(corners[0][0]),VALID_COLUMN_GTP.index(corners[1][0])), max(VALID_COLUMN_GTP.index(corners[0][0]),VALID_COLUMN_GTP.index(corners[1][0])))
-        cols = (min(int(corners[0][1:]),int(corners[1][1:])),max(int(corners[0][1:]),int(corners[1][1:])))
+        x_min, x_max = sorted((x_c1, x_c2))
+        y_min, y_max = sorted((y_c1, y_c2))
 
-        moves_to_keep = []
+        kept_moves = list()
 
-        moves_gtp = self.list_move_to_gtp()
-
-        for i in moves_gtp:
-            col = VALID_COLUMN_GTP.index(i[2])
-            row = int(i[3:])
-
-            if rows[0] <= col <= rows[1] and cols[0] <= row <= cols[1]:
-                moves_to_keep.append(i)
-        
-        return moves_to_keep
-
-                
+        for move in self.game.moves:
+            x, y = move.pos
+            if x_min <= x <= x_max and y_min <= y <= y_max:
+                kept_moves.append(move)      
             
