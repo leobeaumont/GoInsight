@@ -52,7 +52,7 @@ def test_sub_board():
 
 def test_moves_sub_board():
     """
-    Test the sizes of sub-boards extracted using the sub_board method.
+    Test the moves of sub-boards extracted using the moves_sub_board method.
     """
     game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
     moves = [Move(game, pos=(0, 0)),
@@ -70,3 +70,21 @@ def test_moves_sub_board():
     assert len(moves_sub_board) == 2
     assert moves_sub_board[0] == moves[0]
     assert moves_sub_board[1] == moves[2]
+
+def test_add_remove_move():
+    """
+    Test the add_move and remove_move methods.
+    """
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
+    board = Board(game)
+    move = Move(game, pos=(10, 10))
+
+    assert board.board[10][10] is None
+
+    board.add_move(move)
+
+    assert board.board[10][10] is not None
+
+    board.remove_move(move)
+
+    assert board.board[10][10] is None
