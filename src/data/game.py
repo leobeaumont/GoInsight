@@ -82,9 +82,10 @@ class Game:
         """
         root_properties = tree.properties
         game = Game(**root_properties)
-
-        game.moves.extend(tree.move_sequence())
-        # A finir: il faut update le board avec la sequence de coups
+        moves = tree.move_sequence()
+        
+        for move in moves:
+            game.play(move)
 
     def next_color(self) -> str:
         """
@@ -129,22 +130,28 @@ class Game:
             ValueError: If the coordinates are invalid.
         """
         if isinstance(pos, tuple):
-            #TODO
-            pass
+            move = Move(self, color, pos)
+            self.board.add_move(move)
+
         elif isinstance(pos, list):
-            #TODO
-            pass
+            for elem in pos:
+                move = Move(self, color, elem)
+                self.board.add_move(move)
+                
         else:
             raise ValueError(f"Game.place -- Invalid argument pos: {pos}")
         
 
-    def play(self, move: str):
+    def play(self, move_gtp: str):
         """
         Play a move.
 
         Args:
-            move (str): Move in the GTP format (e.g.: 'W A19').
+            move_gtp (str): Move in the GTP format (e.g.: 'W A19').
         """
-        # A finir quand on aura codé le Board !
-        # penser a update la value de move.turn
+        move = Move.from_gtp(self, move_gtp)
+        move.turn = len(self.moves)
         self.moves.append(move)
+        self.board.add_move(move)
+
+    # Dans game.to_sgf_tree() penser à ajouter les propriete qui sont dans constants.py à l'arbre
