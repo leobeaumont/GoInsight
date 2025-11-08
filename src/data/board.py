@@ -58,10 +58,10 @@ class Board:
         Raises:
             ValueError: If the moves provided countain an illegal sequence.
         """
-        board = [[None] * self.size[0]] * self.size[1]
+        board = [[None] * self.size[0] for _ in range(self.size[1])]
 
         for i, move in enumerate(moves):
-            if not self.is_valid_pos(move.pos):
+            if not self.is_valid_pos(move.pos, board):
                 raise ValueError(f"Board.board_from_moves(moves) -- Invalid position at index {i}: {move.pos}")
             
             x, y = move.pos
@@ -69,24 +69,31 @@ class Board:
 
         return board        
 
-    def is_valid_pos(self, pos: Tuple[int, int]) -> bool:
+    def is_valid_pos(self, pos: Tuple[int, int], board: Optional[List[List[Optional["Move"]]]] = None) -> bool:
         """
         Check if a position is valid on the board.
 
         Args:
             pos (Tuple[int, int]): Coordinates on board (first coord is left to right, second coord is top to bottom and both starts at 0).
+            board (List[List[Optional[Move]]], optional): Board tested (default to object's board if not provided).
 
         Returns:
             bool: Wether the position is valid or not.
         """
+        if board is None:
+            board = self.board
+            size = self.size
+        else:
+            size = (len(board[0]), len(board))
+
         x, y = pos
-        x_size, y_size = self.size
+        x_size, y_size = size
 
         if x < 0 or y < 0:
             return False
         elif x >= x_size or y >= y_size:
             return False
-        elif self.board[y][x] is not None:
+        elif board[y][x] is not None:
             return False
         else:
             return True
@@ -106,7 +113,7 @@ class Board:
         x_c1, y_c1 = corner1
         x_c2, y_c2 = corner2
 
-        size = (abs(x_c1 - x_c2), abs(y_c1 - y_c2))
+        size = (abs(x_c1 - x_c2) + 1, abs(y_c1 - y_c2) + 1)
         moves = self.moves_sub_board(corner1, corner2)
 
         return Board(self.game, size, moves)
@@ -135,6 +142,8 @@ class Board:
             x, y = move.pos
             if x_min <= x <= x_max and y_min <= y <= y_max:
                 kept_moves.append(move)
+
+        return kept_moves
 
     def add_move(self, move: "Move"):
         """

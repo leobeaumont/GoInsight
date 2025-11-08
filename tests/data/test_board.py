@@ -8,33 +8,22 @@ def test_board_initialization():
     """
     Test the initialization of the Board class.
     """
-    game = Game()
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
     board = Board(game)
 
     assert board.game == game
     assert board.size == (19, 19)
-    assert board.sequence == []
-
-def test_list_move_to_gtp():
-    """
-    Test the list_move_to_gtp method of the Board class.
-    """
-    game = Game()
-    board = Board(game)
-
-    move1 = Move("B", (3, 3))
-    move2 = Move("W", "pass")
-    board.sequence = [move1, move2]
-
-    gtp_list = board.list_move_to_gtp()
-    assert gtp_list == ["B D16"]  # Assuming (3,3) corresponds to D16 on a 19x19 board
-
+    for i in range(19):
+        for j in range(19):
+            assert board.board[i][j] is None
+ 
 def test_is_valid_pos():
     """
     Test the is_valid_pos method of the Board class.
     """
-    game = Game()
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
     board = Board(game)
+    move = Move(game, pos=(10, 10))
 
     valid_pos = (10, 10)
     invalid_pos = (20, 20)  # Assuming a 19x19 board
@@ -42,37 +31,42 @@ def test_is_valid_pos():
     assert board.is_valid_pos(valid_pos) == True
     assert board.is_valid_pos(invalid_pos) == False
 
+    board.add_move(move)
+
+    assert board.is_valid_pos(valid_pos) == False # Position already played   
+
 def test_sub_board():
     """
     Test the sub_board method of the Board class.
     """
-    game = Game()
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
     board = Board(game)
 
-    corners = ("D4", "K10")
-    # Validate corners before calling sub_board
-    for corner in corners:
-        assert corner[0] in VALID_COLUMN_GTP
-        line = int(corner[1:])
-        assert 1 <= line <= board.size[1]
-    sub_board = board.sub_board(corners)
+    corner1 = (0, 0)
+    corner2 = (7, 6)
+    sub_board = board.sub_board(corner1, corner2)
 
     assert isinstance(sub_board, Board)
-    assert sub_board.size == (8, 7)  # Assuming D4 to K10 corresponds to an 8x7 board
+    assert sub_board.size == (8, 7)
     assert sub_board.game == game
 
-@pytest.mark.parametrize("corners, expected_size", [
-    (("A1", "C3"), (3, 3)),  # Valid range for a 19x19 board
-    (("D4", "F6"), (3, 3)),  # Valid range for a 19x19 board
-    (("J10", "L15"), (4, 6)),  # Adjusted to ensure "L15" is within valid range
-])
-def test_sub_board_sizes(corners, expected_size):
+def test_moves_sub_board():
     """
     Test the sizes of sub-boards extracted using the sub_board method.
     """
-    game = Game()
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
+    moves = [Move(game, pos=(0, 0)),
+             Move(game, pos=(10, 10)),
+             Move(game, pos=(1, 1)),
+             Move(game, pos=(10, 9))]
+    game.moves = moves
     board = Board(game)
 
-    sub_board = board.sub_board(corners)
-    assert sub_board.size == expected_size
+    corner1 = (0, 0)
+    corner2 = (9, 9)
 
+    moves_sub_board = board.moves_sub_board(corner1, corner2)
+
+    assert len(moves_sub_board) == 2
+    assert moves_sub_board[0] == moves[0]
+    assert moves_sub_board[1] == moves[2]

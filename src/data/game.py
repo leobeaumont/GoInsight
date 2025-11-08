@@ -109,7 +109,7 @@ class Game:
         Returns:
             (bool): Wether the position is playable or not.
         """
-        pass
+        return self.board.is_valid_pos(pos)
     
     @overload
     def place(self, color: str, pos: Tuple[int, int]): ...
