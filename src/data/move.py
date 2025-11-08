@@ -52,6 +52,7 @@ class Move:
             if not self.game.is_valid_pos(pos):
                 raise ValueError("Invalid position")
         self.pos = pos
+        self.turn = None
 
     @classmethod
     def sgf_to_coord(cls, sgf_pos: str) -> Optional[Tuple[int, int]]:

@@ -82,7 +82,9 @@ class Board:
         x, y = pos
         x_size, y_size = self.size
 
-        if x >= x_size or y >= y_size:
+        if x < 0 or y < 0:
+            return False
+        elif x >= x_size or y >= y_size:
             return False
         elif self.board[y][x] is not None:
             return False
@@ -133,3 +135,37 @@ class Board:
             x, y = move.pos
             if x_min <= x <= x_max and y_min <= y <= y_max:
                 kept_moves.append(move)
+
+    def add_move(self, move: "Move"):
+        """
+        Add a move to the board.
+
+        Args:
+            move (Move): Move to add.
+
+        Raises:
+            ValueError: If the move is not valid.
+        """
+        if not self.is_valid_pos(move.pos):
+            raise ValueError(f"Board.add_move(move) -- Invalid move: {move.pos}")
+        
+        x, y = move.pos
+        self.board[y][x] = move
+
+    def remove_move(self, move: "Move"):
+        """
+        Add a move to the board.
+
+        Args:
+            move (Move): Move to remove.
+
+        Raises:
+            ValueError: If the position of the move doesn't exist.
+        """
+        x, y = move.pos
+        x_size, y_size = self.size
+
+        if 0 <= x < x_size and 0 <= y < y_size:
+            self.board[y][x] = None
+        else:
+            raise ValueError(f"Board.remove_board(move) -- Invalid position: {move.pos}")

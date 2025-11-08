@@ -59,8 +59,8 @@ class Game:
         self.handicap: int = int(HA[0])
 
         # Variable/storage attributes
-        self.board: Board = Board(self, size)
         self.moves: List[Move] = list()
+        self.board: Board = Board(self, size, self.moves)
 
         # Board setup
         if AB:
@@ -146,4 +146,5 @@ class Game:
             move (str): Move in the GTP format (e.g.: 'W A19').
         """
         # A finir quand on aura codé le Board !
+        # penser a update la value de move.turn
         self.moves.append(move)
