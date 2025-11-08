@@ -113,3 +113,40 @@ def test_sgf_to_gtp(sgf_pos, gtp_pos):
     tests the translation of an sgf position into a gtp position.
     """
     assert Move.sgf_to_gtp(sgf_pos, (19, 19)) == gtp_pos
+
+@pytest.mark.parametrize("gtp_move, expected", [
+    ("b A1", ("b", (0, 0))),
+    ("w T19", ("w", (18, 18))),
+    ("B D4", ("b", (3, 3))),
+    ("W J10", ("w", (8, 9))),
+    ("b pass", ("b", None))
+])
+def test_from_gtp_valid(gtp_move, expected):
+    """
+    Tests valid GTP moves parsing.
+    """
+    game = FakeGame(False)
+    move = Move.from_gtp(game, gtp_move)
+
+    assert move.color == expected[0]
+    assert move.pos == expected[1]
+    assert move.game == game
+
+
+@pytest.mark.parametrize("gtp_move", [
+    "b",                # Missing position
+    "bA1",              # No space
+    "b A1 extra",       # Too many arguments
+    "x A1",             # Invalid color
+    "w I1",             # Invalid column
+    "b A0",             # Invalid row
+    "b A20",            # Row out of range
+    "",                 # Empty string
+])
+def test_from_gtp_invalid(gtp_move):
+    """
+    Tests invalid GTP moves that should raise ValueError.
+    """
+    game = FakeGame(False)
+    with pytest.raises(ValueError):
+        Move.from_gtp(game, gtp_move)

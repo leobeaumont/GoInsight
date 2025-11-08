@@ -91,7 +91,43 @@ class Move:
         col = VALID_COLUMN_GTP[coords[0]]
         line = str(board_size[1] - coords[1])
         return col + line
+    
+    @classmethod
+    def from_gtp(cls, game: "Game", gtp_move: str) -> "Move":
+        """
+        Create a move from a GTP instruction.
 
+        Args:
+            game (Game): Game to associate with the move.
+            gtp_move (str): Move in the GTP format (e.g.: 'w A19').
+
+        Returns:
+            Move: Corresponding Move object.
+
+        Raises:
+            ValueError: If the instruction is not under GTP format.
+        """
+        parsed = gtp_move.split(" ")
+
+        if len(parsed) != 2:
+            raise ValueError(f"Move.from_gtp(gtp_move) -- Invalid argument gtp_move: {gtp_move}")
+        
+        color, gtp_pos = parsed
+
+        if color.lower() not in ["b", "w"]:
+            raise ValueError(f"Move.from_gtp(gtp_move) -- Invalid argument gtp_move: {gtp_move}")
+        
+        if gtp_pos == "pass":
+            pos = None
+        else:
+            x = VALID_COLUMN_GTP.index(gtp_pos[0].upper())
+            y = int(gtp_pos[1:]) - 1
+            if not 0 <= y <= game.size[0] - 1:
+                raise ValueError(f"Move.from_gtp(gtp_move) -- Invalid argument gtp_move: {gtp_move}")
+            pos = (x, y)
+
+        return Move(game, color.lower(), pos)
+            
     def to_gtp(self) -> str:
         """
         Translate the move to the gtp format.
