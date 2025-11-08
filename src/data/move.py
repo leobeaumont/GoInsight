@@ -43,7 +43,7 @@ class Move:
     ):
         self.game = game
         
-        if color in ['b', 'w']:
+        if color in ['B', 'W', 'b', 'w']:
             self.color = color
         else:
             self.color = self.game.next_color()

@@ -64,10 +64,10 @@ class Game:
 
         # Board setup
         if AB:
-            self.place("black", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AB])
+            self.place("B", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AB])
         
         if AW:
-            self.place("white", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AW])
+            self.place("W", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AW])
     
     @classmethod
     def from_sgftree(cls, tree: SgfTree) -> "Game":
@@ -98,7 +98,7 @@ class Game:
         # If black has bonus stones to handicap white, white start the game. Except if black has only one bonus stone, then black starts the game.
         if not self.moves:
             return "B" if self.handicap < 2 else "W"
-        return "BW"[self.moves[-1][0] == "B"] # Returns 'W' if last move is 'B' and 'B' otherwise.
+        return "BW"[self.moves[-1].color.upper() == "B"] # Returns 'W' if last move is 'B' and 'B' otherwise.
 
     def is_valid_pos(self, pos: Tuple[int, int]) -> bool:
         """
@@ -137,7 +137,7 @@ class Game:
             for elem in pos:
                 move = Move(self, color, elem)
                 self.board.add_move(move)
-                
+
         else:
             raise ValueError(f"Game.place -- Invalid argument pos: {pos}")
         
