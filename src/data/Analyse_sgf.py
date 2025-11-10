@@ -1,7 +1,6 @@
 import subprocess
 import shlex
 from sgf_to_list import sgf_list
-import ast
 
 
 
@@ -18,9 +17,9 @@ def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, 
     """
     command = (
         f"python src/data/katago_analysis.py "
-        f"-katago-path {shlex.quote(katago_path)} "
-        f"-config-path {shlex.quote(config_path)} "
-        f"-model-path {shlex.quote(model_path)} "
+        f"-katago-path ./model/katago "
+        f"-config-path ./model/default_gtp.cfg "
+        f"-model-path ./neuralnet/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz "
         f"-moves-to-analyze {shlex.quote(moves_to_analyze)} "
         f"-sizeX-to-analyze {shlex.quote(sizeX)} "
         f"-sizeY-to-analyze {shlex.quote(sizeY)}"
@@ -29,12 +28,6 @@ def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, 
     print(f"Executing command: {command}")
 
     try:
-        # Use subprocess.run for a more modern and safer way to run external commands.
-        # shell=True is used here because shlex.quote handles spaces in paths,
-        # and we're building a single string command.
-        # If your paths don't have spaces, you could use a list of arguments
-        # with shell=False for slightly better security against injection,
-        # but with shlex.quote, this approach is generally safe.
         result = subprocess.run(
             command,
             shell=True,
@@ -60,38 +53,4 @@ def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, 
     except Exception as e:
         print(f"\nAn unexpected error occurred: {e}")
 
-if __name__ == "__main__":
-    # Define your paths and moves
-    katago_exec_path = "./model/katago"
-    config_file_path = "./model/default_gtp.cfg"
-    model_file_path = "./neuralnet/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz"
-
-
-    game_name = input("Name of the game to analyze : ")
-    path = f"/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/KataGo/Matches/{game_name}.sgf"
-    game = sgf_list(path)
-    
-    print("Choose coordonate and size to analyze e.g. A1")
-    coord = input("Coord of new board : ")
-    print("Size of the board to analyze (square or rectangular)")
-    sizeX = input("SizeX to analyze : ")
-    sizeY = input("SizeY to analyze : ")
-
-    repere_X = (ord(coord[0])-ord('A'), ord(coord[0])-ord('A')+int(sizeX)-1)
-    repere_Y = (int(coord[1])-1, int(coord[1]) + int(sizeY)-2)
-    new_game =[]
-    for i in game :
-        if i[1][0]>=repere_X[0] and i[1][0]<=repere_X[1]:
-            if i[1][1]>=repere_Y[0] and i[1][1]<=repere_Y[1]:
-                new_pos = (i[0],(i[1][0]-repere_X[0],i[1][1]-repere_Y[0]))
-                new_game.append(new_pos)
-
-
-    run_katago_analysis(
-        katago_exec_path,
-        config_file_path,
-        model_file_path,
-        str(new_game),
-        sizeX,
-        sizeY
-    )
+    return result.stdout
