@@ -52,7 +52,7 @@ class Game:
         size = [int(txt) for txt in SZ[0].split(":")]
         if len(size) == 1:
             size *= 2
-        self.size: Tuple[int, int] = size
+        self.size: Tuple[int, int] = tuple(size)
 
         self.komi: float = float(KM[0])
 
@@ -86,6 +86,8 @@ class Game:
         
         for move in moves:
             game.play(move)
+
+        return game
 
     def next_color(self) -> str:
         """

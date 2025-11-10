@@ -115,9 +115,9 @@ def test_sgf_to_gtp(sgf_pos, gtp_pos):
     assert Move.sgf_to_gtp(sgf_pos, (19, 19)) == gtp_pos
 
 @pytest.mark.parametrize("gtp_move, expected", [
-    ("b A1", ("b", (0, 0))),
-    ("w T19", ("w", (18, 18))),
-    ("B D4", ("b", (3, 3))),
+    ("b A1", ("b", (0, 18))),
+    ("w T19", ("w", (18, 0))),
+    ("B D4", ("b", (3, 15))),
     ("W J10", ("w", (8, 9))),
     ("b pass", ("b", None))
 ])

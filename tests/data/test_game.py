@@ -10,7 +10,7 @@ def test_game_init_basic():
     game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
     
     assert game.ruleset == "Japanese"
-    assert game.size == [19, 19]
+    assert game.size == (19, 19)
     assert game.komi == 6.5
     assert game.handicap == 0
     assert len(game.moves) == 0
@@ -44,7 +44,7 @@ def test_game_init_size_parsing(size_input, expected):
     Test parsing of SZ property into board size (supports rectangular boards).
     """
     game = Game(RU=["Japanese"], SZ=size_input, KM=["6.5"])
-    assert tuple(game.size) == expected
+    assert game.size == expected
 
 
 def test_next_color():
@@ -103,7 +103,7 @@ def test_play_adds_move():
     assert len(game.moves) == 1
     move = game.moves[0]
     assert move.color == "b"
-    assert move.pos == (0, 0)
+    assert move.pos == (0, 18)
     assert move.turn == 0
     assert game.board is not None
 
@@ -122,5 +122,9 @@ def test_from_sgftree(tmp_path):
     tree = DummyTree()
     game = Game.from_sgftree(tree)
 
-    # The method does not return the game (no return), so check it runs fine
-    assert game is None
+    assert isinstance(game, Game)
+    assert game.ruleset == "Japanese"
+    assert game.size == (19, 19)
+    assert game.komi == 6.5
+    assert isinstance(game.moves[0], Move)
+    assert game.moves[0].pos == (0, 18)

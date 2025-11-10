@@ -121,7 +121,7 @@ class Move:
             pos = None
         else:
             x = VALID_COLUMN_GTP.index(gtp_pos[0].upper())
-            y = int(gtp_pos[1:]) - 1
+            y = game.size[1] - int(gtp_pos[1:])
             if not 0 <= y <= game.size[0] - 1:
                 raise ValueError(f"Move.from_gtp(gtp_move) -- Invalid argument gtp_move: {gtp_move}")
             pos = (x, y)
