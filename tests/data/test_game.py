@@ -128,3 +128,56 @@ def test_from_sgftree(tmp_path):
     assert game.komi == 6.5
     assert isinstance(game.moves[0], Move)
     assert game.moves[0].pos == (0, 18)
+
+def test_to_sgftree_basic():
+    """
+    Test basic SGF tree generation without moves.
+    """
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
+    tree = game.to_sgftree()
+
+    assert tree.properties["RU"] == ["Japanese"]
+    assert tree.properties["SZ"] == ["19"]
+    assert tree.properties["KM"] == ["6.5"]
+    assert "HA" in tree.properties
+    assert len(tree.children) == 0
+
+
+def test_to_sgftree_with_AB_AW():
+    """
+    Test SGF tree generation includes setup stones.
+    """
+    game = Game(
+        RU=["Chinese"],
+        SZ=["9"],
+        KM=["5.5"],
+        AB=["aa", "bb"],
+        AW=["cc"],
+    )
+    tree = game.to_sgftree()
+
+    assert sorted(tree.properties["AB"]) == ["aa", "bb"]
+    assert tree.properties["AW"] == ["cc"]
+
+
+def test_to_sgftree_rectangular_size():
+    """
+    Test rectangular board size is formatted correctly.
+    """
+    game = Game(RU=["Japanese"], SZ=["9:13"], KM=["6.5"])
+    tree = game.to_sgftree()
+    assert tree.properties["SZ"] == ["9:13"]
+
+
+def test_to_sgftree_with_moves():
+    """
+    Test SGF tree structure contains moves in sequence.
+    """
+    game = Game(RU=["Japanese"], SZ=["9"], KM=["6.5"])
+    game.play("b A9")
+    game.play("w B2")
+
+    tree = game.to_sgftree()
+    assert len(tree.children) == 1
+    assert len(tree.children[0].children) == 1
+    assert tree.children[0].properties["B"] == ["aa"]

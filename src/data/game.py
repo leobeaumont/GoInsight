@@ -110,8 +110,10 @@ class Game:
             "SZ": [size],
             "KM": [str(self.komi)],
             "HA": [str(self.handicap)],
-            }.update(SGF_PROPERTIES)
+            }
         
+        root_properties.update(SGF_PROPERTIES)
+
         if self.AB is not None:
             root_properties["AB"] = self.AB
         if self.AW is not None:
@@ -194,5 +196,3 @@ class Game:
         move.turn = len(self.moves)
         self.moves.append(move)
         self.board.add_move(move)
-
-    # Dans game.to_sgf_tree() penser à ajouter les propriete qui sont dans constants.py à l'arbre
