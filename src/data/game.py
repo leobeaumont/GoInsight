@@ -11,6 +11,7 @@ Modules:
 """
 
 from typing import List, Optional, overload, Tuple, Union
+from .constants import SGF_PROPERTIES
 from .board import Board
 from .move import Move
 from .sgf import SgfTree
@@ -63,6 +64,8 @@ class Game:
         self.board: Board = Board(self, size, self.moves)
 
         # Board setup
+        self.AB = AB
+        self.AW = AW
         if AB:
             self.place("B", [Move.sgf_to_coord(sgf_pos) for sgf_pos in AB])
         
@@ -78,7 +81,7 @@ class Game:
             tree (SgfTree): SgfTree of the game.
         
         Returns:
-            (Game): The game provided in the sgf tree.
+            Game: The game provided in the sgf tree.
         """
         root_properties = tree.properties
         game = Game(**root_properties)
@@ -88,13 +91,49 @@ class Game:
             game.play(move)
 
         return game
+    
+    def to_sgftree(self) -> SgfTree:
+        """
+        Create a new SgfTree object from the game.
+
+        Returns:
+            SgfTree: The SgfTree corresponding to the game.
+        """
+        # Size formating
+        if self.size[0] != self.size[1]:
+            size = f"{self.size[0]}:{self.size[1]}"
+        else:
+            size = str(self.size[0])
+
+        root_properties = {
+            "RU": [self.ruleset],
+            "SZ": [size],
+            "KM": [str(self.komi)],
+            "HA": [str(self.handicap)],
+            }.update(SGF_PROPERTIES)
+        
+        if self.AB is not None:
+            root_properties["AB"] = self.AB
+        if self.AW is not None:
+            root_properties["AW"] = self.AW
+
+        root = SgfTree(root_properties)
+        
+        # Build tree structure
+        current_node = root
+        for move in self.moves:
+            child = SgfTree(move.to_sgf())
+            current_node.children.append(child)
+            current_node = child
+
+        return root
 
     def next_color(self) -> str:
         """
         Tells if it is black's or white's turn.
 
         Returns:
-            (str): 'B' for black and 'W' for white.
+            str: 'B' for black and 'W' for white.
         """
         # Notes: by default black start the game
         # If black has bonus stones to handicap white, white start the game. Except if black has only one bonus stone, then black starts the game.
@@ -107,10 +146,10 @@ class Game:
         Tells if a position is valid for a move.
 
         Args:
-            pos (Tuple[int, int]): Position to test.
+            pos (Tuple[int,int]): Position to test.
 
         Returns:
-            (bool): Wether the position is playable or not.
+            bool: Wether the position is playable or not.
         """
         return self.board.is_valid_pos(pos)
     
@@ -126,7 +165,7 @@ class Game:
 
         Args:
             color (str): Color of the stone(s).
-            pos (Tuple[int, int] | List[Tuple[int, int]]): Coordinates of the stone(s).
+            pos (Tuple[int,int] | List[Tuple[int,int]]): Coordinates of the stone(s).
 
         Raises:
             ValueError: If the coordinates are invalid.

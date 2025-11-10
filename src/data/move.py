@@ -10,7 +10,7 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import Optional, Tuple, TYPE_CHECKING
+from typing import Dict, List, Optional, Tuple, TYPE_CHECKING
 from .constants import VALID_COLUMN_GTP, VALID_COLUMN_SGF
 
 if TYPE_CHECKING:
@@ -63,7 +63,7 @@ class Move:
             sgf_pos (str): Coordinates in the SGF format.
 
         Returns:
-            (Tuple[int, int], optional): The corresponding coordinates.
+            Tuple[int, int], optional: The corresponding coordinates.
         
         Raises:
             ValueError: If the sgf position has an invalid character.
@@ -81,7 +81,7 @@ class Move:
             sgf_pos (str): Coordinates in the SGF format.
 
         Returns:
-            (str): The corresponding position in GTP format ('pass' if sgf_pos is empty).
+            str: The corresponding position in GTP format ('pass' if sgf_pos is empty).
         """
         coords = Move.sgf_to_coord(sgf_pos)
 
@@ -130,10 +130,10 @@ class Move:
             
     def to_gtp(self) -> str:
         """
-        Translate the move to the gtp format.
+        Translate the move to the GTP format.
         
         Returns:
-            (str): the move in gtp format.
+            str: the move in GTP format.
         """
         out = self.color
 
@@ -147,3 +147,16 @@ class Move:
         out += " " + play
         
         return out
+    
+    def to_sgf(self) -> Dict[str, List[str]]:
+        """
+        Translate the move to the SGF format.
+
+        Returns:
+            Dict[str,List[str]]: Key encode the color and value is the position in SGF format inserted in a list. 
+        """
+        x, y = self.pos
+        pos_sgf = VALID_COLUMN_SGF[x] + VALID_COLUMN_SGF[y]
+
+        return {self.color.upper(): [pos_sgf]}
+
