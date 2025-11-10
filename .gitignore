@@ -33,3 +33,6 @@ neuralnet/
 *.pt
 *.bin
 *.onnx
+
+# Pyright local config
+pyrightconfig.json

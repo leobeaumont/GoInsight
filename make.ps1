@@ -50,9 +50,25 @@ $BENCHMARK_OUT  = Join-Path $MODEL_DIR "benchmark_output.txt"
 
 function Create-Venv {
   Write-Host "`nChecking Python installation..."
-  try { iex "$PY_CMD --version" } catch {
-    Write-Error "Python not found. Please install Python 3.x and ensure it's on PATH."; exit 1
+  try { 
+      $pyVersionOutput = & $PY_CMD --version 2>&1
+      $pyVersionOutput = $pyVersionOutput -replace '[^\d\.]', ''
+  } catch {
+      Write-Error "Python not found. Please install Python 3.7 or higher and ensure it's on PATH."
+      exit 1
   }
+
+  # Parse version numbers
+  $versionParts = $pyVersionOutput.Split('.')
+  $major = [int]$versionParts[0]
+  $minor = [int]$versionParts[1]
+
+  if ($major -lt 3 -or ($major -eq 3 -and $minor -lt 7)) {
+      Write-Error "Python 3.7 or higher is required. Found $pyVersionOutput. Please upgrade Python."
+      exit 1
+  }
+
+  Write-Host "Python version $pyVersionOutput detected."
 
   if (-not (Test-Path $VENV)) {
     Write-Host "`nCreating virtual environment in $VENV..."

@@ -26,6 +26,8 @@
 
 ## Installation
 
+This project requires Python `3.7` or higher. Please ensure Python `3.7+` is installed and available on your `PATH` before running the setup.
+
 ### Unix (Linux/MacOS)
 
 First, open a terminal in the directory you'd like to clone the project in.
