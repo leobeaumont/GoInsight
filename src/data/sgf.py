@@ -104,9 +104,24 @@ class SgfTree:
     
     @classmethod
     def from_game(cls, game: "Game") -> "SgfTree":
+        """
+        Create a new SgfTree object from the game.
+
+        Returns:
+            SgfTree: The SgfTree corresponding to the game.
+        """
         return game.to_sgftree()
 
     def to_game(self) -> "Game":
+        """
+        Create a new Game object from an sgf tree.
+
+        Args:
+            tree (SgfTree): SgfTree of the game.
+        
+        Returns:
+            Game: The game provided in the sgf tree.
+        """
         from .game import Game
         return Game.from_sgftree(self)
     

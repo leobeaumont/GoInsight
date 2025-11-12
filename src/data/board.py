@@ -11,8 +11,6 @@ Modules:
 """
 
 from typing import Optional, Tuple, TYPE_CHECKING, List
-from .constants import VALID_COLUMN_GTP
-import numpy as np
 
 if TYPE_CHECKING:
     from .game import Game

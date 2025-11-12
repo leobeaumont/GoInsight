@@ -1,7 +1,4 @@
-data.move Module
-================
-
-.. automodule:: data.move
+.. autoclass:: data.move.Move
    :members:
    :undoc-members:
    :show-inheritance:

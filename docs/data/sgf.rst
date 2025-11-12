@@ -1,4 +1,4 @@
-.. autoclass:: data.game.Game
+.. autoclass:: data.sgf.SgfTree
    :members:
    :undoc-members:
    :show-inheritance:

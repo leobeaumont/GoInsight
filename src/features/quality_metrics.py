@@ -1,11 +1,17 @@
 from copy import deepcopy
 import json
-import os
 import platform
 import subprocess
 
-from ..data import SgfTree
+from data.sgf import SgfTree
 from .constants import ANALYSIS_CONFIG_PATH, MODEL_DIR, NEURALNET_PATH
+
+class Analizer:
+    """
+    TO DO, mettre tout le code là dedans.
+    """
+    def __init__(self):
+        pass
 
 def katago_analysis(tree: SgfTree):
     """
@@ -115,8 +121,10 @@ def analyze_last_move(tree: SgfTree):
 def count_moves(tree: SgfTree):
     """
     This function counts the number of moves played in a Go game represented by an SgfTree.
+
     Args:
         tree (SgfTree): The SGF tree representing the game.
+
     Returns:
         int: The number of moves played in the game.
     """
@@ -132,8 +140,10 @@ def count_moves(tree: SgfTree):
 def analyse_game(tree: SgfTree):
     """
     This function analyzes a Go game represented by an SgfTree and provides insights on the quality of moves played.
+
     Args:
         tree (SgfTree): The SGF tree representing the game.
+
     Returns:
         list[list]: A list of lists containing the score lead and winrate after each move of the game.
     """
