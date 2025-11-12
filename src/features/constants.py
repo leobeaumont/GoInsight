@@ -4,4 +4,4 @@ ANALYSIS_CONFIG_PATH = "/".join([MODEL_DIR, "analysis_example.cfg"])
 GRAPH_ANALYSIS_CONFIG_PATH = "/".join([MODEL_DIR, "graph_analysis.cfg"])
 
 NEURALNET_DIR = "neuralnet"
-NEURALNET_PATH = "/".join([NEURALNET_DIR, "kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz"])
+NEURALNET_PATH = "/".join([NEURALNET_DIR, "g170e-b10c128-s1141046784-d204142634.bin.gz"])
