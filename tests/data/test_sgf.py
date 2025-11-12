@@ -1,0 +1,217 @@
+import pytest
+from src.data import SgfTree, parse, serialize
+
+@pytest.mark.parametrize("tree,expected", [
+    (SgfTree({"AB": ["aa", "bb"]}, [SgfTree({"C": ["comment"]})]), True),
+    (SgfTree({"C": ["root"]}), True),
+])
+def test_sgf_equality(tree, expected):
+    """
+    Test equality and inequality of SgfTree instances.
+    """
+    same = SgfTree(tree.properties.copy(), [SgfTree(c.properties.copy()) for c in tree.children])
+    different = SgfTree({"X": ["y"]})
+
+    assert (tree == same) == expected
+    assert (tree != same) is False
+    assert (tree == different) is False
+
+
+@pytest.mark.parametrize("tree,expected_substring", [
+    (SgfTree({"C": ["hello"]}), "(;C[hello])"),
+    (SgfTree({"AB": ["aa", "bb"]}), "(;AB[aa][bb])")
+])
+def test_serialize(tree, expected_substring):
+    """
+    Test SGF serialization of a simple tree.
+    """
+    sgf_str = tree.to_sgf()
+    assert expected_substring in sgf_str
+    assert sgf_str.startswith("(")
+    assert sgf_str.endswith(")")
+
+
+@pytest.mark.parametrize("tree", [
+    SgfTree({"C": ["Root"], "AB": ["aa"]}, [SgfTree({"B": ["bb"]}, [SgfTree({"W": ["cc"]})])])
+])
+def test_serialize_parse_roundtrip(tree):
+    """
+    Test that serializing and then parsing produces the same tree.
+    """
+    sgf_str = tree.to_sgf()
+    parsed = parse(sgf_str)
+    assert parsed == tree
+
+
+def test_escape_characters():
+    """
+    Test escaping of special SGF characters in serialization.
+    """
+    tree = SgfTree({"C": ["backslash \\", "close ] bracket"]})
+    sgf_str = serialize(tree)
+
+    assert "\\\\" in sgf_str
+    assert "\\]" in sgf_str
+
+    parsed = parse("(" + sgf_str + ")")
+    assert parsed.properties["C"] == ["backslash \\", "close ] bracket"]
+
+
+def test_to_sgf_file(tmp_path):
+    """
+    Test writing SGF data to a file.
+    """
+    file_path = tmp_path / "out.sgf"
+    tree = SgfTree({"C": ["file test"]})
+    sgf_str = tree.to_sgf(str(file_path))
+
+    assert file_path.exists()
+    with open(file_path, "r", encoding="utf-8") as f:
+        content = f.read()
+    assert content == sgf_str
+
+
+def test_from_sgf_file(tmp_path):
+    """
+    Test reading an SGF file into an SgfTree.
+    """
+    path = tmp_path / "sample.sgf"
+    path.write_text("(;C[test])", encoding="utf-8")
+
+    tree = SgfTree.from_sgf(str(path))
+    assert isinstance(tree, SgfTree)
+    assert tree.properties == {"C": ["test"]}
+
+
+def test_from_sgf_file_not_found():
+    """
+    Test that FileNotFoundError is raised for missing files.
+    """
+    error = False
+    try:
+        SgfTree.from_sgf("no_file_here.sgf")
+    except FileNotFoundError:
+        error = True
+    assert error
+
+
+@pytest.mark.parametrize("sgf_text", [
+    ";C[test]",    # missing parentheses
+    "(;c[test])",  # lowercase property
+    "()"           # empty tree
+])
+def test_parse_invalid(sgf_text):
+    """
+    Test invalid SGF parsing cases.
+    """
+    error = False
+    try:
+        parse(sgf_text)
+    except ValueError:
+        error = True
+    assert error
+
+
+def test_multi_child_serialization():
+    """
+    Test that multiple children are serialized with proper parentheses.
+    """
+    child1 = SgfTree({"B": ["aa"]})
+    child2 = SgfTree({"W": ["bb"]})
+    root = SgfTree({"C": ["root"]}, [child1, child2])
+
+    sgf_str = serialize(root)
+    assert "(;B[aa])(;W[bb])" in sgf_str
+
+
+@pytest.mark.parametrize("tree, expected", [
+    (
+        SgfTree({"RU": ["japanese"], "SZ": ["19"], "KM": ["6.5"], "B": ["aa"]}, # Tree root
+                [SgfTree({"W": ["bb"]}, # Child 1
+                [SgfTree({"B": ["cc"]})])] # Child 2
+        ),
+
+        ["B A19", "W B18", "B C17"] # Expected
+    ),
+    (
+        SgfTree({"RU": ["japanese"], "SZ": ["19"], "KM": ["6.5"], "B": ["dd"]}), # Tree
+
+        ["B D16"] # Expected
+    ),
+])
+def test_move_sequence(tree, expected):
+    """
+    Test SGF move sequence extraction in GTP format.
+    """
+    result = tree.move_sequence(insert_tuple=False)
+    assert result == expected
+
+
+@pytest.mark.parametrize("tree, expected", [
+    (
+        SgfTree({"RU": ["japanese"], "SZ": ["19"], "KM": ["6.5"], "B": ["aa"]}, # Root
+        [SgfTree({"W": [""]})]), # Child 1
+
+        [("B", "A19"), ("W", "pass")] # Expected
+    ),
+    (
+        SgfTree({"RU": ["japanese"], "SZ": ["19"], "KM": ["6.5"], "W": ["tt"]}), # Root
+
+        [("W", "U0")] # Expected
+    ),
+])
+def test_move_sequence_list_separated(tree, expected):
+    """
+    Test SGF move sequence extraction with list_separated=True.
+    """
+    result = tree.move_sequence(insert_tuple=True)
+    assert result == expected
+
+
+@pytest.mark.parametrize("tree", [
+    SgfTree({"C": ["no moves"]}),
+    SgfTree(),
+])
+def test_move_sequence_empty(tree):
+    """
+    Test that move_sequence returns an empty list for trees without moves.
+    """
+    assert tree.move_sequence() == []
+
+
+@pytest.mark.parametrize("tree, expected, error", [
+    (
+        SgfTree({"SZ": ["19"]}),
+        (19, 19),
+        False
+    ),
+    (
+        SgfTree({"SZ": ["10:15"]}),
+        (10, 15),
+        False
+    ),
+    (
+        SgfTree(),
+        None,
+        True
+    ),
+    (
+        SgfTree({"SZ": ["-1"]}),
+        None,
+        True
+    )
+])
+def test_get_board_size(tree, expected, error):
+    """
+    Tests that the size of the board is fetched correclty with square and rectangular sizes, also tests error cases.
+    """
+    error_happened = False
+    try:
+        board_size = tree.get_board_size()
+    except Exception as e:
+        error_happened = True
+
+    if error:
+        assert error_happened
+    else:
+        assert board_size == expected
