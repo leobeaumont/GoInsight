@@ -3,7 +3,7 @@ import json
 import platform
 import subprocess
 
-from data.sgf import SgfTree
+from ..data import SgfTree
 from .constants import ANALYSIS_CONFIG_PATH, MODEL_DIR, NEURALNET_PATH
 
 class Analizer:

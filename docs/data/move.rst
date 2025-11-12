@@ -1,4 +1,4 @@
-.. autoclass:: data.move.Move
+.. autoclass:: src.data.move.Move
    :members:
    :undoc-members:
    :show-inheritance:

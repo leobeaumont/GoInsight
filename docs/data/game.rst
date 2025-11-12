@@ -1,4 +1,4 @@
-.. autoclass:: data.game.Game
+.. autoclass:: src.data.game.Game
    :members:
    :undoc-members:
    :show-inheritance:
