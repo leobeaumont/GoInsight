@@ -4,7 +4,7 @@ import platform
 import subprocess
 
 from ..data import Game, SgfTree
-from .constants import ANALYSIS_CONFIG_PATH, MODEL_DIR, NEURALNET_PATH
+from .constants import GRAPH_ANALYSIS_CONFIG_PATH, MODEL_DIR, NEURALNET_PATH
 
 class Analizer:
     """
@@ -61,7 +61,7 @@ class Analizer:
         model,
         "analysis",
         "-model", NEURALNET_PATH,
-        "-config", ANALYSIS_CONFIG_PATH
+        "-config", GRAPH_ANALYSIS_CONFIG_PATH
         ]
 
         # Running the command
@@ -164,14 +164,5 @@ if __name__ == "__main__":
     from src.data.sgf import SgfTree
     # Création de l'arbre racine
     test_game = SgfTree.from_sgf("games/sapindenoel.sgf")
-    """test_game = SgfTree({"RU": ["japanese"], "KM": ["7.5"], "SZ": ["19"]})
-    # On ajoute un coup noir puis blanc
-    test_game.children.append(SgfTree({"B": ["dd"]}))
-    test_game.children[0].children.append(SgfTree({"W": ["pp"]}))"""
     analysis = Analizer.katago_analysis(test_game)
     print(analysis)
-    #move_qualities = analyse_game(test_game)
-    #print("Move Qualities:", move_qualities)
-"""    print("Score Lead:", score_lead)
-    print("Candidate Moves:", candidate_moves)
-    print("Win Rate:", winrate)"""
