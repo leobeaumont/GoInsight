@@ -11,7 +11,7 @@ Modules:
 """
 
 from typing import Optional, Tuple, TYPE_CHECKING, List
-from .constants import VALID_COLUMN_GTP
+from .constants import VALID_COLUMN_SGF, VALID_COLUMN_GTP
 import numpy as np
 
 if TYPE_CHECKING:
@@ -178,3 +178,32 @@ class Board:
             self.board[y][x] = None
         else:
             raise ValueError(f"Board.remove_board(move) -- Invalid position: {move.pos}")
+        
+    def area_selection(coup1,coup2,next_player="") -> List[dict]:
+        """
+        Convert two SGF coordinates into board corner coordinates for area selection.
+        Args:
+            coup1 (str): First SGF coordinate (e.g., 'ab').
+            coup2 (str): Second SGF coordinate (e.g., 'ig').
+        Returns:
+            List[dict]: List containing one dictionary with 'Player' and 'Moves' keys for the forbidden moves.
+        """        
+        x1,y1 = coup1
+        x2,y2 = coup2
+        x1_index = VALID_COLUMN_SGF.index(x1)
+        y1_index = VALID_COLUMN_SGF.index(y1)
+        x2_index = VALID_COLUMN_SGF.index(x2)
+        y2_index = VALID_COLUMN_SGF.index(y2)
+        x_min = min(x1_index, x2_index)
+        x_max = max(x1_index, x2_index)
+        y_min = min(y1_index, y2_index)
+        y_max = max(y1_index, y2_index)
+        forbidden_moves = []
+        dic = {"Player": [], " Moves": []}
+        for x in range(x_min, x_max + 1):
+            for y in range(y_min, y_max + 1):
+                sgf_x = VALID_COLUMN_SGF[x]
+                sgf_y = VALID_COLUMN_SGF[y]
+                dic["Player"].append(next_player)
+                dic[" Moves"].append(f'{sgf_x}{sgf_y}')
+        return [dic]
