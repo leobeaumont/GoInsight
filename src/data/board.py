@@ -189,7 +189,7 @@ class Board:
             invert_output (bool): If True, returns the reverse area selection.
         Returns:
             List[dict]: List containing one dictionary with 'Player' and 'Moves' keys for the forbidden moves.
-        """        
+        """
         x1,y1 = coo1
         x2,y2 = coo2
         x1_index = VALID_COLUMN_SGF.index(x1)
