@@ -1,5 +1,5 @@
-from .quality_metrics import katago_analysis
+from .quality_metrics import Analizer
 
 __all__ = [
-    "katago_analysis"
+    "Analizer"
     ]

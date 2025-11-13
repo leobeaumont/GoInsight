@@ -207,7 +207,7 @@ class SgfTree:
         return tuple(board_size)
 
         
-def parse(input):
+def parse(input: str) -> "SgfTree":
     """Parse an SGF string into an SgfTree object.
 
     This function parses the textual SGF format and returns the corresponding
@@ -242,9 +242,9 @@ def parse(input):
         while input[ind].isupper():
             ind += 1
         if input[ind].islower():
-            raise ValueError('property must be in uppercase')
+            raise ValueError(f'property must be in uppercase at index {ind}: {input[ind]}')
         if input[ind] != '[':
-            raise ValueError('properties without delimiter')
+            raise ValueError(f'properties without delimiter at index {ind}: {input[ind]}')
         key = input[pos:ind]
         prop = {key: []}
         pos = ind
@@ -292,6 +292,7 @@ def parse(input):
         
     if not input.startswith('('):
         raise ValueError('tree missing')
+    input = "".join(input.split())
     return get_node()
 
 def serialize(tree: "SgfTree") -> str:
