@@ -179,12 +179,14 @@ class Board:
         else:
             raise ValueError(f"Board.remove_board(move) -- Invalid position: {move.pos}")
         
-    def area_selection(coo1,coo2,next_player="") -> List[dict]:
+    def area_selection(coo1:str,coo2:str,next_player:str,invert_output:bool=False) -> List[dict]:
         """
         Convert two SGF coordinates into board corner coordinates for area selection.
         Args:
             coup1 (str): First SGF coordinate (e.g., 'ab').
             coup2 (str): Second SGF coordinate (e.g., 'ig').
+            next_player (str): Next player to play in the area.
+            invert_output (bool): If True, returns the reverse area selection.
         Returns:
             List[dict]: List containing one dictionary with 'Player' and 'Moves' keys for the forbidden moves.
         """        
@@ -200,38 +202,17 @@ class Board:
         y_max = max(y1_index, y2_index)
         dic = {"Player": [], " Moves": []}
         dic["Player"].append(next_player)
-        for x in range(x_min, x_max + 1):
-            for y in range(y_min, y_max + 1):
-                sgf_x = VALID_COLUMN_SGF[x]
-                sgf_y = VALID_COLUMN_SGF[y]
-                dic[" Moves"].append(f'{sgf_x}{sgf_y}')
-        return [dic]
-    
-    def reverse_selection(coo1,coo2,next_player="") -> List[dict]:
-        """
-        Convert two SGF coordinates into board corner coordinates for reverse area selection.
-        Args:
-            coup1 (str): First SGF coordinate (e.g., 'ab').
-            coup2 (str): Second SGF coordinate (e.g., 'ig').
-        Returns:
-            List[dict]: List containing one dictionary with 'Player' and 'Moves' keys for the forbidden moves outside the area.
-        """
-        x1,y1 =coo1
-        x2,y2 = coo2
-        x1_index = VALID_COLUMN_SGF.index(x1)
-        y1_index = VALID_COLUMN_SGF.index(y1)
-        x2_index = VALID_COLUMN_SGF.index(x2)
-        y2_index = VALID_COLUMN_SGF.index(y2)
-        x_min = min(x1_index, x2_index)
-        x_max = max(x1_index, x2_index)
-        y_min = min(y1_index, y2_index)
-        y_max = max(y1_index, y2_index)
-        dic = {"Player": [], " Moves": []}
-        dic["Player"].append(next_player)
-        for x in range(0,19):
-            for y in range(0,19):
-                if x < x_min or x > x_max or y < y_min or y > y_max:
+        if invert_output == False :
+            for x in range(x_min, x_max + 1):
+                for y in range(y_min, y_max + 1):
                     sgf_x = VALID_COLUMN_SGF[x]
                     sgf_y = VALID_COLUMN_SGF[y]
                     dic[" Moves"].append(f'{sgf_x}{sgf_y}')
+        else :
+            for x in range(0,19):
+                for y in range(0,19):
+                    if x < x_min or x > x_max or y < y_min or y > y_max:
+                        sgf_x = VALID_COLUMN_SGF[x]
+                        sgf_y = VALID_COLUMN_SGF[y]
+                        dic[" Moves"].append(f'{sgf_x}{sgf_y}')
         return [dic]
