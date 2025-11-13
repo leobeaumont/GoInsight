@@ -99,7 +99,7 @@ make run-model
 
 ### Optimise KataGo for your device (optional)
 
-Start a batch of tests to find the best parameters (/!\ runtime is very long: ~30 mins)
+Start a batch of tests to find the best parameters (This will take a few minutes)
 
 #### Unix (Linux/MacOS)
 

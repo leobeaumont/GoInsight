@@ -29,7 +29,7 @@ help:
 	@echo "  make docs      - Open docs"
 	@echo "  make tests     - Run tests"
 	@echo "  make get-model - Download model"
-	@echo "  make opt-model - Optimise model for your device (this command has a very long runtime ~30mins)"
+	@echo "  make opt-model - Optimise model for your device (this will take a few minutes)"
 	@echo "  make run-model - Start a gtp session with the model"
 	@echo "  make clean     - Remove venv, docs, model and logs"
 
