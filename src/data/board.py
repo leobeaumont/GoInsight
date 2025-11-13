@@ -178,3 +178,9 @@ class Board:
             self.board[y][x] = None
         else:
             raise ValueError(f"Board.remove_board(move) -- Invalid position: {move.pos}")
+        
+    def update_board(self):
+        """
+        TO DO
+        """
+        pass
