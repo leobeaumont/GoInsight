@@ -165,4 +165,15 @@ if __name__ == "__main__":
     # Création de l'arbre racine
     test_game = SgfTree.from_sgf("games/sapindenoel.sgf")
     analysis = Analizer.katago_analysis(test_game)
-    print(analysis)
+    data = dict()
+    for turn in analysis:
+        data[turn["turnNumber"]] = (turn["rootInfo"]["scoreLead"], turn["rootInfo"]["winrate"])
+
+    print("turn | scoreLead")
+    for i in range(len(analysis)):
+        if i < 10:
+            print(f"{i}    | {data[i][0]}")
+        elif i < 100:
+            print(f"{i}   | {data[i][0]}")
+        else:
+            print(f"{i}  | {data[i][0]}")
