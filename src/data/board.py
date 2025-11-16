@@ -10,7 +10,7 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import Optional, Tuple, TYPE_CHECKING, List
+from typing import Set, Iterable, Optional, Tuple, TYPE_CHECKING, List
 from .constants import VALID_COLUMN_GTP
 import numpy as np
 
@@ -179,8 +179,105 @@ class Board:
         else:
             raise ValueError(f"Board.remove_board(move) -- Invalid position: {move.pos}")
         
-    def update_board(self):
+
+    def _neighbors(self, x: int, y: int) -> Iterable[Tuple[int, int]]:
         """
-        TO DO
+        Yield the orthogonal neighbors of a board coordinate.
+
+        A neighbor is returned only if it lies within the board's boundaries.
+        Neighbors follow 4-connectivity: left, right, up, down.
+
+        Args:
+            x (int): X-coordinate of the reference point (column).
+            y (int): Y-coordinate of the reference point (row).
+
+        Returns:
+            Iterable[Tuple[int, int]]: An iterable yielding coordinates of all
+            valid orthogonal neighbors.
         """
-        pass
+        x_size, y_size = self.size
+        if x > 0: yield (x - 1, y)
+        if x < x_size - 1: yield (x + 1, y)
+        if y > 0: yield (x, y - 1)
+        if y < y_size - 1: yield (x, y + 1)
+
+    def _group_and_liberties(self, start: Tuple[int, int]) -> Tuple[Set[Tuple[int, int]], Set[Tuple[int, int]]]:
+        """
+        Compute the connected group of a stone and all its liberties.
+
+        A group consists of all stones of the same color connected through
+        orthogonal adjacency (4-neighborhood). Liberties are all empty
+        intersections adjacent to any stone in the group.
+
+        Args:
+            start (Tuple[int, int]): Coordinate of the starting stone.
+
+        Returns:
+            Tuple[Set[Tuple[int, int]], Set[Tuple[int, int]]]:
+                - A set of coordinates representing the group.
+                - A set of coordinates representing all liberties of that group.
+        """
+        x0, y0 = start
+        stone = self.board[y0][x0]
+        if stone is None:
+            return set(), set()
+
+        color = stone.color.lower()
+        stack = [(x0, y0)]
+        visited = set([(x0, y0)])
+        group = set()
+        liberties = set()
+
+        while stack:
+            x, y = stack.pop()
+            group.add((x, y))
+            for nx, ny in self._neighbors(x, y):
+                cell = self.board[ny][nx]
+                if cell is None:
+                    liberties.add((nx, ny))
+                elif cell.color.lower() == color and (nx, ny) not in visited:
+                    visited.add((nx, ny))
+                    stack.append((nx, ny))
+
+        return group, liberties
+
+        
+    def update_board(self) -> List[Tuple[int, int]]:
+        """
+        Detect and remove all captured groups from the board.
+
+        A captured group is any set of stones with zero liberties.
+        The function scans the entire board, evaluates each group once,
+        removes the ones without liberties, and returns their coordinates.
+
+        This function is rule-agnostic: it also removes self-captured stones.
+
+        Returns:
+            List[Tuple[int, int]]: Sorted list of coordinates of all stones
+            removed during the capture resolution.
+        """
+        to_remove = set()
+        visited = set()
+
+        y_size = self.size[1]
+        x_size = self.size[0]
+
+        for y in range(y_size):
+            for x in range(x_size):
+                if self.board[y][x] is None:
+                    continue
+                if (x, y) in visited:
+                    continue
+
+                group, liberties = self._group_and_liberties((x, y))
+                visited.update(group)
+
+                if len(liberties) == 0:
+                    to_remove.update(group)
+
+        # Remove captured stones
+        for x, y in to_remove:
+            self.board[y][x] = None
+
+        return [(x, y) for (x, y) in sorted(to_remove)]
+

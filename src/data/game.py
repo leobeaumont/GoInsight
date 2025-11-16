@@ -185,14 +185,42 @@ class Game:
             raise ValueError(f"Game.place -- Invalid argument pos: {pos}")
         
 
-    def play(self, move_gtp: str):
+    def play(self, move_gtp: str) -> None:
         """
         Play a move.
 
         Args:
             move_gtp (str): Move in the GTP format (e.g.: 'W A19').
+
+        Raises:
+            ValueError: If the move is illegal (invalid format, out of bounds,
+                played on an occupied point, or a suicidal move).
         """
         move = Move.from_gtp(self, move_gtp)
         move.turn = len(self.moves)
-        self.moves.append(move)
+
+        # Pass move: does not affect the board
+        if move.pos is None:
+            self.moves.append(move)
+            return
+
+        x, y = move.pos
+
+        # Backup the board state before attempting the move
+        board_backup = [row.copy() for row in self.board.board]
+
+        # Place the stone (also checks that the position is free and in bounds)
         self.board.add_move(move)
+
+        # Resolve captures (groups with no liberties)
+        removed = self.board.update_board()
+
+        # If the stone we just played was removed -> suicide is forbidden
+        if (x, y) in removed:
+            # Restore previous board state
+            self.board.board = board_backup
+            raise ValueError("Game.play -- Suicide is not allowed")
+
+        # Legal move: record it in the move history
+        self.moves.append(move)
+
