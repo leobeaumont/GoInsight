@@ -87,7 +87,10 @@ class Analizer:
         output_lines = [line for line in process.stdout.splitlines() if line.strip()]
         output_data = [json.loads(line) for line in output_lines]
 
-        self.game_analysis = output_data
+        # Sort by turn
+        sorted_output_data = sorted(output_data, key=lambda x: x["turnNumber"])
+
+        self.game_analysis = sorted_output_data
 
     def deep_turn_analysis(
             self,
@@ -175,12 +178,12 @@ class Analizer:
         if self.game_analysis is None:
             raise ValueError(f"Analizer.game_score_lead() -- Run the game analysis before this: Analizer.game_analysis = None")
 
-        # Sort the analysis by turn and extract the score lead
-        return [data["rootInfo"]["scoreLead"] for data in sorted(self.game_analysis, key= lambda x: x["turnNumber"])]
+        # Extract the score lead
+        return [data["rootInfo"]["scoreLead"] for data in self.game_analysis]
 
 
 if __name__ == "__main__":
-    analizer = Analizer("games/sapindenoel.sgf")
+    analizer = Analizer("games/sapindenoel_tronque.sgf")
     analizer.shalow_game_analysis()
     list_score_lead = analizer.game_score_lead()
 
@@ -192,3 +195,5 @@ if __name__ == "__main__":
             print(f"{i}   | {score_lead}")
         else:
             print(f"{i}  | {score_lead}")
+
+    print(analizer.game_analysis[10])
