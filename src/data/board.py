@@ -12,7 +12,6 @@ Modules:
 
 from typing import Set, Iterable, Optional, Tuple, TYPE_CHECKING, List
 from .constants import VALID_COLUMN_GTP
-import numpy as np
 
 if TYPE_CHECKING:
     from .game import Game
@@ -201,7 +200,7 @@ class Board:
         if y > 0: yield (x, y - 1)
         if y < y_size - 1: yield (x, y + 1)
 
-    def _group_and_liberties(self, start: Tuple[int, int]) -> Tuple[Set[Tuple[int, int]], Set[Tuple[int, int]]]:
+    def group_and_liberties(self, start: Tuple[int, int]) -> Tuple[Set[Tuple[int, int]], Set[Tuple[int, int]]]:
         """
         Compute the connected group of a stone and all its liberties.
 
@@ -269,7 +268,7 @@ class Board:
                 if (x, y) in visited:
                     continue
 
-                group, liberties = self._group_and_liberties((x, y))
+                group, liberties = self.group_and_liberties((x, y))
                 visited.update(group)
 
                 if len(liberties) == 0:
