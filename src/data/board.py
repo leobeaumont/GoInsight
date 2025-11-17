@@ -12,7 +12,6 @@ Modules:
 
 from typing import Optional, Tuple, TYPE_CHECKING, List
 from .constants import VALID_COLUMN_GTP
-import numpy as np
 
 if TYPE_CHECKING:
     from .game import Game
@@ -98,9 +97,9 @@ class Board:
         else:
             return True
     
-    def sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> "Board":
+    def area_selection_sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> dict:
         """
-        Extract a sub-board from the current board.
+        Extract area selection that are within a sub-board defined by the given corners.
         Coordinate format is (x, y) starting at 0 and both corners are included in the selection.
 
         Args:
@@ -108,15 +107,24 @@ class Board:
             corner2 (Tuple[int, int]): Coordinate of area's second corner.
 
         Returns:
-            Board: The sub-board.
+            dict: Dictionary with player to move as key and list of positions in GTP format as value.
         """
+
         x_c1, y_c1 = corner1
         x_c2, y_c2 = corner2
 
-        size = (abs(x_c1 - x_c2) + 1, abs(y_c1 - y_c2) + 1)
-        moves = self.moves_sub_board(corner1, corner2)
+        x_min, x_max = sorted((x_c1, x_c2))
+        y_min, y_max = sorted((y_c1, y_c2))
 
-        return Board(self.game, size, moves)
+
+        area = []
+        for i in range(x_min, x_max + 1):
+            for j in range(y_min, y_max + 1):
+                col = VALID_COLUMN_GTP[i]
+                line = str(self.size[1] - j)
+                area.append(col + line)
+        
+        return area
     
     def moves_sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> List["Move"]:
         """
@@ -130,20 +138,13 @@ class Board:
         Returns:
             List[Move]: List of moves within the sub-board.
         """
-        x_c1, y_c1 = corner1
-        x_c2, y_c2 = corner2
+        
+        player_to_move = self.game.next_color()
 
-        x_min, x_max = sorted((x_c1, x_c2))
-        y_min, y_max = sorted((y_c1, y_c2))
+        area = self.area_selection_sub_board(corner1, corner2)
+        
+        return {player_to_move: area}
 
-        kept_moves = list()
-
-        for move in self.game.moves:
-            x, y = move.pos
-            if x_min <= x <= x_max and y_min <= y <= y_max:
-                kept_moves.append(move)
-
-        return kept_moves
 
     def add_move(self, move: "Move"):
         """
