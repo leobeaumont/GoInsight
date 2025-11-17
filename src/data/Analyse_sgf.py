@@ -4,7 +4,7 @@ from sgf_to_list import sgf_list
 
 
 
-def run_katago_analysis(katago_path, moves_to_analyze, sizeX = "19", sizeY = "19"):
+def run_katago_analysis(katago_path, config_path, model_path, moves_to_analyze, sizeX = "19", sizeY = "19"):
     """
     Executes the KataGo analysis command using subprocess.
 
@@ -52,3 +52,5 @@ def run_katago_analysis(katago_path, moves_to_analyze, sizeX = "19", sizeY = "19
         print(f"\nError: The Python script 'analysis_katago.py' or KataGo executable '{katago_path}' was not found.")
     except Exception as e:
         print(f"\nAn unexpected error occurred: {e}")
+
+    return result.stdout
