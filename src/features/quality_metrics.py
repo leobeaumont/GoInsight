@@ -26,7 +26,7 @@ class Analizer:
     def __init__(self, file: str, player: str = "B"):
         self.tree = SgfTree.from_sgf(file)
 
-        if player != "B" or player != "W":
+        if player != "B" and player != "W":
             raise ValueError(f"Analizer(file, player) -- The value of player must be 'B' or 'W' not: {player}")
         self.player = player
 
@@ -162,21 +162,33 @@ class Analizer:
 
         self.turn_analysis[turn] = output_data
 
+    def game_score_lead(self) -> List[float]:
+        """
+        This function returns the score lead of black over the course of the game.
+
+        Returns:
+            List[float]: List of the score lead at every turn.
+
+        Raises:
+            ValueError: If the game analysis is not done yet.
+        """
+        if self.game_analysis is None:
+            raise ValueError(f"Analizer.game_score_lead() -- Run the game analysis before this: Analizer.game_analysis = None")
+
+        # Sort the analysis by turn and extract the score lead
+        return [data["rootInfo"]["scoreLead"] for data in sorted(self.game_analysis, key= lambda x: x["turnNumber"])]
+
 
 if __name__ == "__main__":
-    from src.data.sgf import SgfTree
-    # Création de l'arbre racine
     analizer = Analizer("games/sapindenoel.sgf")
     analizer.shalow_game_analysis()
-    data = dict()
-    for turn in analizer.game_analysis:
-        data[turn["turnNumber"]] = (turn["rootInfo"]["scoreLead"], turn["rootInfo"]["winrate"])
+    list_score_lead = analizer.game_score_lead()
 
     print("turn | scoreLead")
-    for i in range(len(analizer.game_analysis)):
+    for i, score_lead in enumerate(list_score_lead):
         if i < 10:
-            print(f"{i}    | {data[i][0]}")
+            print(f"{i}    | {score_lead}")
         elif i < 100:
-            print(f"{i}   | {data[i][0]}")
+            print(f"{i}   | {score_lead}")
         else:
-            print(f"{i}  | {data[i][0]}")
+            print(f"{i}  | {score_lead}")
