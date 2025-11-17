@@ -1,7 +1,7 @@
 import json
 import platform
 import subprocess
-from typing import List
+from typing import List, Tuple
 
 from ..data import Game, SgfTree
 from .constants import GAME_ANALYSIS_CONFIG_PATH, MODEL_DIR, NEURALNET_PATH, TURN_ANALYSIS_CONFIG_PATH
@@ -180,6 +180,35 @@ class Analizer:
 
         # Extract the score lead
         return [data["rootInfo"]["scoreLead"] for data in self.game_analysis]
+    
+    def turn_basic_data(self, turn: int) -> Tuple[float, float, str, float]:
+        """
+        This function returns the basic infos to display on the analysis UI.
+
+        Args:
+            turn (int): Selected turn. 
+
+        Returns:
+            float: Winrate of the position.
+            float: Score lead of the position.
+            str  : KataGo best move in GTP format.
+            float: Score lead after KataGo best move.
+            str  : Next turn player ('B' or 'W').
+
+        Raises:
+            ValueError: If the turn selected is not in the game.
+        """
+        if turn >= len(self.game_analysis):
+            raise ValueError(f"Analizer.turn_basic_data(turn) -- The turn selected is not in the game analysis: turn = {turn}")
+
+        turn_analysis = self.game_analysis[turn]
+
+        winrate = turn["rootInfo"]["winrate"]
+        score_lead = turn["rootInfo"]["scoreLead"]
+        best_move, score_lead_best_move = [(move["move"], move["scoreLead"]) for move in turn["moveInfos"] if move["order"] == 0]
+        next_player = "BW"[turn["rootInfo"]["currentPlayer"] == "B"]
+
+        return winrate, score_lead, best_move, score_lead_best_move, next_player
 
 
 if __name__ == "__main__":
