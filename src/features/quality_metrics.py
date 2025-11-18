@@ -203,10 +203,10 @@ class Analizer:
 
         turn_analysis = self.game_analysis[turn]
 
-        winrate = turn["rootInfo"]["winrate"]
-        score_lead = turn["rootInfo"]["scoreLead"]
-        best_move, score_lead_best_move = [(move["move"], move["scoreLead"]) for move in turn["moveInfos"] if move["order"] == 0]
-        next_player = "BW"[turn["rootInfo"]["currentPlayer"] == "B"]
+        winrate = turn_analysis["rootInfo"]["winrate"]
+        score_lead = turn_analysis["rootInfo"]["scoreLead"]
+        best_move, score_lead_best_move = [(move["move"], move["scoreLead"]) for move in turn_analysis["moveInfos"] if move["order"] == 0][0]
+        next_player = "BW"[turn_analysis["rootInfo"]["currentPlayer"] == "B"]
 
         return winrate, score_lead, best_move, score_lead_best_move, next_player
 
@@ -225,4 +225,4 @@ if __name__ == "__main__":
         else:
             print(f"{i}  | {score_lead}")
 
-    print(analizer.game_analysis[10])
+    print(analizer.turn_basic_data(10))
