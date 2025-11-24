@@ -29,4 +29,4 @@ html_static_path = ['_static']
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../src'))  # adjust if your code is in src/
+sys.path.insert(0, os.path.abspath('..'))  # adjust if your code is in src/

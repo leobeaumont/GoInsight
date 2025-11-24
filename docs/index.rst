@@ -10,5 +10,8 @@ GoInsight documentation
    :maxdepth: 2
    :caption: Contents:
 
+   data/board
    data/game
    data/move
+   data/sgf
+   features/quality_metrics
