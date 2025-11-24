@@ -88,3 +88,72 @@ def test_add_remove_move():
     board.remove_move(move)
 
     assert board.board[10][10] is None
+
+def test_neighbors(x=10, y=10):
+    """
+    Test the _neighbors method of the Board class.
+    """
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
+    board = Board(game)
+
+    x, y = 10, 10
+    neighbors = list(board._neighbors(x, y))
+
+    expected_neighbors = [(9, 10), (11, 10), (10, 9), (10, 11)]
+
+    assert set(neighbors) == set(expected_neighbors)
+
+
+def test_group_liberties():
+    """
+    Test the group_liberties method of the Board class.
+    """
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
+    board = Board(game)
+
+    move = Move(game, "b", pos=(10, 10))
+    board.add_move(move)
+    move = Move(game, "b", pos=(10, 11))
+    board.add_move(move)
+
+
+    group = {(10, 10), (10, 11)}
+    group_test, liberties_test = board.group_and_liberties((10, 10))
+
+    print(liberties_test)
+    print(group_test)
+
+    assert group_test == group
+
+    expected_liberties = {(9, 10), (11, 10), (10, 9), (10, 12), (9, 11), (11, 11)}
+
+    assert liberties_test == expected_liberties
+
+def test_update_board():
+    """
+    Test the update_board method of the Board class.
+    """
+    game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
+    board = Board(game)
+
+    moves = [Move(game, "b", pos=(0, 0)),
+             Move(game, "w", pos=(1, 0)),
+             Move(game, "b", pos=(0, 1)),
+             Move(game, "w", pos=(1, 1)),
+             Move(game, "b", pos=(10, 10)),
+             Move(game, "w", pos=(10, 11)),
+             Move(game, "b", pos=(11, 10)),
+             Move(game, "w", pos=(0, 2))]
+
+    game.moves = moves
+
+    for i in moves:
+        board.add_move(i)
+
+    removed_pieces = board.update_board()
+
+    assert len(removed_pieces) == 2
+    assert (0,0) in removed_pieces
+    assert (0,1) in removed_pieces
+    assert board.board[0][0] is None
+    assert board.board[1][0] is None
