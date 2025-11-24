@@ -99,7 +99,7 @@ make run-model
 
 ### Optimise KataGo for your device (optional)
 
-Start a batch of tests to find the best parameters (/!\ runtime is very long: ~30 mins)
+Start a batch of tests to find the best parameters (This will take a few minutes)
 
 #### Unix (Linux/MacOS)
 
@@ -114,9 +114,9 @@ make opt-model
 
 ### Tests
 
-#### Unix (Linux/MacOS)
-
 This will run all tests declared in the tests directory
+
+#### Unix (Linux/MacOS)
 
 ```bash
 make tests
@@ -130,9 +130,9 @@ make tests
 
 ### Documentation
 
-#### Unix (Linux/MacOS)
-
 This will open the project's documentation on your default web browser
+
+#### Unix (Linux/MacOS)
 
 ```bash
 make docs
@@ -146,9 +146,9 @@ make docs
 
 ### Clean project
 
-#### Unix (Linux/MacOS)
-
 Remove setup files and the virtual environment from the project
+
+#### Unix (Linux/MacOS)
 
 ```bash
 make clean

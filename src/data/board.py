@@ -10,8 +10,7 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import Set, Iterable, Optional, Tuple, TYPE_CHECKING, List
-from .constants import VALID_COLUMN_GTP
+from typing import Optional, Tuple, TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from .game import Game
@@ -88,8 +87,9 @@ class Board:
             return False
         elif x >= x_size or y >= y_size:
             return False
-        elif board[y][x] is not None:
-            return False
+        # Pourra etre réactivé quand on aura codé la capture de pièce dans le Board
+        #elif board[y][x] is not None:
+            #return False
         else:
             return True
     

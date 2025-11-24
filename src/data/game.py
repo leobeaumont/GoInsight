@@ -34,7 +34,9 @@ class Game:
         komi (float): Komi.
         handicap (int): Number of handicap stones given to Black.
         board (Board): Board of the game, used to store board states.
-        moves (List[str]): Sequence of moves in GTP format (e.g.: ["W A19", "B B18", "W pass"])
+        moves (List[str]): Sequence of moves.
+        AB (List[str], optional): Initial stones for black.
+        AW (List[str], optional): Initial stones for white.
     """
 
     def __init__(
