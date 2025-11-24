@@ -10,7 +10,7 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import Optional, Tuple, TYPE_CHECKING, List
+from typing import Iterable, Optional, Set, Tuple, TYPE_CHECKING, List
 
 if TYPE_CHECKING:
     from .game import Game
