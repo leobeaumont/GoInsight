@@ -11,6 +11,7 @@ Modules:
 """
 
 import os
+
 from typing import Dict, List, Optional, Tuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
@@ -103,9 +104,24 @@ class SgfTree:
     
     @classmethod
     def from_game(cls, game: "Game") -> "SgfTree":
+        """
+        Create a new SgfTree object from the game.
+
+        Returns:
+            SgfTree: The SgfTree corresponding to the game.
+        """
         return game.to_sgftree()
 
     def to_game(self) -> "Game":
+        """
+        Create a new Game object from an sgf tree.
+
+        Args:
+            tree (SgfTree): SgfTree of the game.
+        
+        Returns:
+            Game: The game provided in the sgf tree.
+        """
         from .game import Game
         return Game.from_sgftree(self)
     
@@ -189,9 +205,9 @@ class SgfTree:
         if len(board_size) == 1:
             board_size *= 2
         return tuple(board_size)
-    
 
-def parse(input):
+        
+def parse(input: str) -> "SgfTree":
     """Parse an SGF string into an SgfTree object.
 
     This function parses the textual SGF format and returns the corresponding
@@ -226,9 +242,9 @@ def parse(input):
         while input[ind].isupper():
             ind += 1
         if input[ind].islower():
-            raise ValueError('property must be in uppercase')
+            raise ValueError(f'property must be in uppercase at index {ind}: {input[ind]}')
         if input[ind] != '[':
-            raise ValueError('properties without delimiter')
+            raise ValueError(f'properties without delimiter at index {ind}: {input[ind]}')
         key = input[pos:ind]
         prop = {key: []}
         pos = ind
@@ -276,6 +292,7 @@ def parse(input):
         
     if not input.startswith('('):
         raise ValueError('tree missing')
+    input = "".join(input.split())
     return get_node()
 
 def serialize(tree: "SgfTree") -> str:

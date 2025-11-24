@@ -2,7 +2,7 @@ import requests
 import pytest
 
 MODEL_URL = "https://github.com/lightvector/KataGo/releases/download/v1.16.3/katago-v1.16.3-eigen-linux-x64.zip"
-NEURALNET_URL = "https://media.katagotraining.org/uploaded/networks/models/kata1/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz"
+NEURALNET_URL = "https://katagoarchive.org/g170/neuralnets/g170e-b10c128-s1141046784-d204142634.bin.gz"
 
 @pytest.mark.parametrize("url", [MODEL_URL, NEURALNET_URL])
 def test_url_accessible(url):

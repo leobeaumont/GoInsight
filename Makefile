@@ -17,8 +17,8 @@ MODEL_DIR = model
 MODEL_FILE = $(MODEL_DIR)/katago.zip
 MODEL_URL = https://github.com/lightvector/KataGo/releases/download/v1.16.3/katago-v1.16.3-eigen-linux-x64.zip
 NEURALNET_DIR = neuralnet
-NEURALNET_FILE = $(NEURALNET_DIR)/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz
-NEURALNET_URL = https://media.katagotraining.org/uploaded/networks/models/kata1/kata1-b28c512nbt-adam-s11165M-d5387M.bin.gz
+NEURALNET_FILE = $(NEURALNET_DIR)/g170e-b10c128-s1141046784-d204142634.bin.gz
+NEURALNET_URL = https://katagoarchive.org/g170/neuralnets/g170e-b10c128-s1141046784-d204142634.bin.gz
 CONFIG_FILE = $(MODEL_DIR)/default_gtp.cfg
 BENCHMARK_OUT = $(MODEL_DIR)/benchmark_output.txt
 OS := $(shell uname)
@@ -29,7 +29,7 @@ help:
 	@echo "  make docs      - Open docs"
 	@echo "  make tests     - Run tests"
 	@echo "  make get-model - Download model"
-	@echo "  make opt-model - Optimise model for your device (this command has a very long runtime ~30mins)"
+	@echo "  make opt-model - Optimise model for your device (this will take a few minutes)"
 	@echo "  make run-model - Start a gtp session with the model"
 	@echo "  make clean     - Remove venv, docs, model and logs"
 

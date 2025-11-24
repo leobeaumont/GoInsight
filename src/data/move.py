@@ -50,7 +50,7 @@ class Move:
         
         if pos is not None:
             if not self.game.is_valid_pos(pos):
-                raise ValueError("Invalid position")
+                raise ValueError(f"Invalid position: {pos}")
         self.pos = pos
         self.turn = None
 
