@@ -61,7 +61,7 @@ class Board:
             
             x, y = move.pos
             self.board[y][x] = move
-            self.local_update_board(move.pos)  
+            self.update_board(move.pos)  
 
     def is_valid_pos(self, pos: Tuple[int, int], board: Optional[List[List[Optional["Move"]]]] = None) -> bool:
         """
@@ -154,6 +154,7 @@ class Board:
         
         x, y = move.pos
         self.board[y][x] = move
+        self.update_board(move.pos)
 
     def remove_move(self, move: Optional["Move"] = None, pos: Optional[Tuple[int, int]] = None):
         """
@@ -241,48 +242,8 @@ class Board:
                     stack.append((nx, ny))
 
         return group, liberties
-
-        
-    def update_board(self) -> List[Tuple[int, int]]:
-        """
-        Detect and remove all captured groups from the board.
-
-        A captured group is any set of stones with zero liberties.
-        The function scans the entire board, evaluates each group once,
-        removes the ones without liberties, and returns their coordinates.
-
-        This function is rule-agnostic: it also removes self-captured stones.
-
-        Returns:
-            List[Tuple[int, int]]: Sorted list of coordinates of all stones
-            removed during the capture resolution.
-        """
-        to_remove = set()
-        visited = set()
-
-        y_size = self.size[1]
-        x_size = self.size[0]
-
-        for y in range(y_size):
-            for x in range(x_size):
-                if self.board[y][x] is None:
-                    continue
-                if (x, y) in visited:
-                    continue
-
-                group, liberties = self.group_and_liberties((x, y))
-                visited.update(group)
-
-                if len(liberties) == 0:
-                    to_remove.update(group)
-
-        # Remove captured stones
-        for pos in to_remove:
-            self.remove_move(pos=pos)
-
-        return [(x, y) for (x, y) in sorted(to_remove)]
     
-    def local_update_board(self, pos: Tuple[int, int]) -> List[Tuple[int, int]]:
+    def update_board(self, pos: Tuple[int, int]):
         """
         Detect and remove all captured groups from the board.
         The detection is only local around the move played.
@@ -322,5 +283,3 @@ class Board:
         # Remove captured stones
         for pos in to_remove:
             self.remove_move(pos=pos)
-
-        return [(x, y) for (x, y) in sorted(to_remove)]

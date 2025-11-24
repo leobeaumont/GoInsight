@@ -141,19 +141,15 @@ def test_update_board():
              Move(game, "b", pos=(0, 1)),
              Move(game, "w", pos=(1, 1)),
              Move(game, "b", pos=(10, 10)),
-             Move(game, "w", pos=(10, 11)),
-             Move(game, "b", pos=(11, 10)),
-             Move(game, "w", pos=(0, 2))]
-
-    game.moves = moves
+             Move(game, "b", pos=(11, 11)),
+             Move(game, "b", pos=(10, 12)),
+             Move(game, "b", pos=(9, 11)),
+             Move(game, "w", pos=(0, 2)),
+             Move(game, "w", pos=(10, 11))]
 
     for i in moves:
         board.add_move(i)
 
-    removed_pieces = board.update_board()
-
-    assert len(removed_pieces) == 2
-    assert (0,0) in removed_pieces
-    assert (0,1) in removed_pieces
     assert board.board[0][0] is None
     assert board.board[1][0] is None
+    assert board.board[11][10] is None
