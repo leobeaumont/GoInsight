@@ -10,7 +10,7 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import Optional, Tuple, TYPE_CHECKING, List
+from typing import Iterable, Optional, Set, Tuple, TYPE_CHECKING, List
 from .constants import VALID_COLUMN_GTP
 
 if TYPE_CHECKING:
