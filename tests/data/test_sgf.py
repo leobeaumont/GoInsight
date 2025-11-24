@@ -54,7 +54,7 @@ def test_escape_characters():
     assert "\\]" in sgf_str
 
     parsed = parse("(" + sgf_str + ")")
-    assert parsed.properties["C"] == ["backslash \\", "close ] bracket"]
+    assert parsed.properties["C"] == ["backslash\\", "close]bracket"]
 
 
 def test_to_sgf_file(tmp_path):

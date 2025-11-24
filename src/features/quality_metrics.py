@@ -1,7 +1,7 @@
 import json
 import platform
 import subprocess
-from typing import List
+from typing import List, Tuple
 
 from ..data import Game, SgfTree
 from .constants import GAME_ANALYSIS_CONFIG_PATH, MODEL_DIR, NEURALNET_PATH, TURN_ANALYSIS_CONFIG_PATH
@@ -26,7 +26,7 @@ class Analizer:
     def __init__(self, file: str, player: str = "B"):
         self.tree = SgfTree.from_sgf(file)
 
-        if player != "B" or player != "W":
+        if player != "B" and player != "W":
             raise ValueError(f"Analizer(file, player) -- The value of player must be 'B' or 'W' not: {player}")
         self.player = player
 
@@ -87,7 +87,10 @@ class Analizer:
         output_lines = [line for line in process.stdout.splitlines() if line.strip()]
         output_data = [json.loads(line) for line in output_lines]
 
-        self.game_analysis = output_data
+        # Sort by turn
+        sorted_output_data = sorted(output_data, key=lambda x: x["turnNumber"])
+
+        self.game_analysis = sorted_output_data
 
     def deep_turn_analysis(
             self,
@@ -162,21 +165,64 @@ class Analizer:
 
         self.turn_analysis[turn] = output_data
 
+    def game_score_lead(self) -> List[float]:
+        """
+        This function returns the score lead of black over the course of the game.
+
+        Returns:
+            List[float]: List of the score lead at every turn.
+
+        Raises:
+            ValueError: If the game analysis is not done yet.
+        """
+        if self.game_analysis is None:
+            raise ValueError(f"Analizer.game_score_lead() -- Run the game analysis before this: Analizer.game_analysis = None")
+
+        # Extract the score lead
+        return [data["rootInfo"]["scoreLead"] for data in self.game_analysis]
+    
+    def turn_basic_data(self, turn: int) -> Tuple[float, float, str, float]:
+        """
+        This function returns the basic infos to display on the analysis UI.
+
+        Args:
+            turn (int): Selected turn. 
+
+        Returns:
+            float: Winrate of the position.
+            float: Score lead of the position.
+            str  : KataGo best move in GTP format.
+            float: Score lead after KataGo best move.
+            str  : Next turn player ('B' or 'W').
+
+        Raises:
+            ValueError: If the turn selected is not in the game.
+        """
+        if turn >= len(self.game_analysis):
+            raise ValueError(f"Analizer.turn_basic_data(turn) -- The turn selected is not in the game analysis: turn = {turn}")
+
+        turn_analysis = self.game_analysis[turn]
+
+        winrate = turn_analysis["rootInfo"]["winrate"]
+        score_lead = turn_analysis["rootInfo"]["scoreLead"]
+        best_move, score_lead_best_move = [(move["move"], move["scoreLead"]) for move in turn_analysis["moveInfos"] if move["order"] == 0][0]
+        next_player = "BW"[turn_analysis["rootInfo"]["currentPlayer"] == "B"]
+
+        return winrate, score_lead, best_move, score_lead_best_move, next_player
+
 
 if __name__ == "__main__":
-    from src.data.sgf import SgfTree
-    # Création de l'arbre racine
-    analizer = Analizer("games/sapindenoel.sgf")
+    analizer = Analizer("games/sapindenoel_tronque.sgf")
     analizer.shalow_game_analysis()
-    data = dict()
-    for turn in analizer.game_analysis:
-        data[turn["turnNumber"]] = (turn["rootInfo"]["scoreLead"], turn["rootInfo"]["winrate"])
+    list_score_lead = analizer.game_score_lead()
 
     print("turn | scoreLead")
-    for i in range(len(analizer.game_analysis)):
+    for i, score_lead in enumerate(list_score_lead):
         if i < 10:
-            print(f"{i}    | {data[i][0]}")
+            print(f"{i}    | {score_lead}")
         elif i < 100:
-            print(f"{i}   | {data[i][0]}")
+            print(f"{i}   | {score_lead}")
         else:
-            print(f"{i}  | {data[i][0]}")
+            print(f"{i}  | {score_lead}")
+
+    print(analizer.turn_basic_data(10))
