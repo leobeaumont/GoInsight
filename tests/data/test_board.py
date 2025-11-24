@@ -152,7 +152,6 @@ def test_update_board():
 
     removed_pieces = board.update_board()
 
-    print(removed_pieces)
     assert len(removed_pieces) == 2
     assert (0,0) in removed_pieces
     assert (0,1) in removed_pieces

@@ -204,9 +204,6 @@ class Game:
             self.moves.append(move)
             return
 
-        x, y = move.pos
-
         # Place the stone (also checks that the position is free and in bounds)
         self.board.add_move(move)
         self.moves.append(move)
-

@@ -42,31 +42,27 @@ class Board:
 
         if moves is None:
             moves = self.game.moves
-        self.board: List[List[Optional["Move"]]] = self.board_from_moves(moves)
+        self.board_from_moves(moves)
 
-    def board_from_moves(self, moves: List["Move"]) -> List[List[Optional["Move"]]]:
+    def board_from_moves(self, moves: List["Move"]):
         """
         Create a board representation from a list of moves.
 
         Args:
             moves (List[Move]): List of moves.
 
-        Returns:
-            List[List[Optional[Move]]]: Representation of the board.
-
         Raises:
             ValueError: If the moves provided countain an illegal sequence.
         """
-        board = [[None] * self.size[0] for _ in range(self.size[1])]
+        self.board = [[None] * self.size[0] for _ in range(self.size[1])]
 
         for i, move in enumerate(moves):
-            if not self.is_valid_pos(move.pos, board):
+            if not self.is_valid_pos(move.pos, self.board):
                 raise ValueError(f"Board.board_from_moves(moves) -- Invalid position at index {i}: {move.pos}")
             
             x, y = move.pos
-            board[y][x] = move
-
-        return board        
+            self.board[y][x] = move
+            self.local_update_board(move.pos)  
 
     def is_valid_pos(self, pos: Tuple[int, int], board: Optional[List[List[Optional["Move"]]]] = None) -> bool:
         """
@@ -160,17 +156,24 @@ class Board:
         x, y = move.pos
         self.board[y][x] = move
 
-    def remove_move(self, move: "Move"):
+    def remove_move(self, move: Optional["Move"] = None, pos: Optional[Tuple[int, int]] = None):
         """
         Add a move to the board.
 
         Args:
-            move (Move): Move to remove.
+            move (Move, optional): Move to remove.
+            pos (Tuple[int, int], optional): Position of the move on board.
 
         Raises:
-            ValueError: If the position of the move doesn't exist.
+            ValueError: If the position of the move doesn't exist or no argument is provided.
         """
-        x, y = move.pos
+        if move is not None:
+            x, y = move.pos
+        elif pos is not None:
+            x, y = pos
+        else:
+            raise ValueError(f"Board.remove_board() -- You must provide either a move or a position to the method")
+        
         x_size, y_size = self.size
 
         if 0 <= x < x_size and 0 <= y < y_size:
@@ -275,8 +278,50 @@ class Board:
                     to_remove.update(group)
 
         # Remove captured stones
-        for x, y in to_remove:
-            self.board[y][x] = None
+        for pos in to_remove:
+            self.remove_move(pos=pos)
 
         return [(x, y) for (x, y) in sorted(to_remove)]
+    
+    def local_update_board(self, pos: Tuple[int, int]) -> List[Tuple[int, int]]:
+        """
+        Detect and remove all captured groups from the board.
+        The detection is only local around the move played.
 
+        A captured group is any set of stones with zero liberties.
+        The function scans the entire board, evaluates each group once,
+        removes the ones without liberties, and returns their coordinates.
+
+        This function is rule-agnostic: it also removes self-captured stones.
+
+        Args:
+            pos (Tuple[int, int]): Position of the move triggering the update.
+
+        Returns:
+            List[Tuple[int, int]]: Sorted list of coordinates of all stones
+            removed during the capture resolution.
+        """
+        to_remove = set()
+        visited = set()
+
+        x, y = pos
+        to_test = [pos] + [pos for pos in self._neighbors(x, y)]
+         
+
+        for x, y in to_test:
+            if self.board[y][x] is None:
+                continue
+            if (x, y) in visited:
+                continue
+
+            group, liberties = self.group_and_liberties((x, y))
+            visited.update(group)
+
+            if len(liberties) == 0:
+                to_remove.update(group)
+
+        # Remove captured stones
+        for pos in to_remove:
+            self.remove_move(pos=pos)
+
+        return [(x, y) for (x, y) in sorted(to_remove)]
