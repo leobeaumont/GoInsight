@@ -97,18 +97,17 @@ class Board:
         else:
             return True
     
-    def area_selection_sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> List[str]:
+    def area_selection_positions(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> List[str]:
         """
-        Extract area positions within a sub-board defined by the given corners.
+        Extract positions within a sub-board defined by the given corners.
 
         Args:
             corner1 (Tuple[int, int]): Coordinate of area's first corner.
             corner2 (Tuple[int, int]): Coordinate of area's second corner.
 
         Returns:
-            List[str]: List of area positions within the sub-board.
+            List[str]: List of positions within the selected area (in GTP format).
         """
-
         x_c1, y_c1 = corner1
         x_c2, y_c2 = corner2
 
@@ -117,32 +116,13 @@ class Board:
 
 
         area = []
-        for i in range(x_min, x_max + 1):
-            for j in range(y_min, y_max + 1):
-                col = VALID_COLUMN_GTP[i]
-                line = str(self.size[1] - j)
+        for x in range(x_min, x_max + 1):
+            for y in range(y_min, y_max + 1):
+                col = VALID_COLUMN_GTP[x]
+                line = str(self.size[1] - y)
                 area.append(col + line)
         
         return area
-    
-    def moves_sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> dict:
-        """
-        Extract area that the next player can play within.
-
-        Args:
-            corner1 (Tuple[int, int]): Coordinate of area's first corner.
-            corner2 (Tuple[int, int]): Coordinate of area's second corner.
-
-        Returns:
-            dict : List of moves within the sub-board.
-        """
-        
-        player_to_move = self.game.next_color()
-
-        area = self.area_selection_sub_board(corner1, corner2)
-        
-        return {player_to_move: area}
-
 
     def add_move(self, move: "Move"):
         """

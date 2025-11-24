@@ -35,24 +35,23 @@ def test_is_valid_pos():
 
     assert board.is_valid_pos(valid_pos) == False # Position already played   
 
-def test_moves_sub_board():
+def test_area_selection_positions():
     """
     Test the moves of sub-boards extracted using the moves_sub_board method.
     """
     game = Game(RU=["Japanese"], SZ=["19"], KM=["6.5"])
-    moves = [Move(game, pos=(0, 0)),
-             Move(game, pos=(10, 10)),
-             Move(game, pos=(1, 1)),
-             Move(game, pos=(10, 9))]
-    game.moves = moves
     board = Board(game)
 
-    corner1 = (0, 0)
-    corner2 = (1, 1)
+    corner1 = (1, 1)
+    corner2 = (2, 2)
 
-    print(board.moves_sub_board(corner1, corner2))
+    area_positions = board.area_selection_positions(corner1, corner2)
 
-    assert board.moves_sub_board(corner1, corner2) == {'W':['A19', 'A18', 'B19', 'B18']}
+    assert len(area_positions) == 4
+    assert "B18" in area_positions
+    assert "B17" in area_positions
+    assert "C18" in area_positions
+    assert "C17" in area_positions
 
 def test_add_remove_move():
     """
@@ -71,5 +70,3 @@ def test_add_remove_move():
     board.remove_move(move)
 
     assert board.board[10][10] is None
-
-
