@@ -87,9 +87,8 @@ class Board:
             return False
         elif x >= x_size or y >= y_size:
             return False
-        # Pourra etre réactivé quand on aura codé la capture de pièce dans le Board
-        #elif board[y][x] is not None:
-            #return False
+        elif board[y][x] is not None:
+            return False
         else:
             return True
     
