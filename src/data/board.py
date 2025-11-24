@@ -10,7 +10,8 @@ Modules:
     sgf   -- handle SGF parsing.
 """
 
-from typing import Iterable, Optional, Set, Tuple, TYPE_CHECKING, List
+from typing import Optional, Tuple, TYPE_CHECKING, List
+from .constants import VALID_COLUMN_GTP
 
 if TYPE_CHECKING:
     from .game import Game
@@ -92,37 +93,16 @@ class Board:
         else:
             return True
     
-    def sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> "Board":
+    def area_selection_positions(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> List[str]:
         """
-        Extract a sub-board from the current board.
-        Coordinate format is (x, y) starting at 0 and both corners are included in the selection.
+        Extract positions within a sub-board defined by the given corners.
 
         Args:
             corner1 (Tuple[int, int]): Coordinate of area's first corner.
             corner2 (Tuple[int, int]): Coordinate of area's second corner.
 
         Returns:
-            Board: The sub-board.
-        """
-        x_c1, y_c1 = corner1
-        x_c2, y_c2 = corner2
-
-        size = (abs(x_c1 - x_c2) + 1, abs(y_c1 - y_c2) + 1)
-        moves = self.moves_sub_board(corner1, corner2)
-
-        return Board(self.game, size, moves)
-    
-    def moves_sub_board(self, corner1: Tuple[int, int], corner2: Tuple[int, int]) -> List["Move"]:
-        """
-        Extract moves that are within a sub-board defined by the given corners.
-        Coordinate format is (x, y) starting at 0 and both corners are included in the selection.
-
-        Args:
-            corner1 (Tuple[int, int]): Coordinate of area's first corner.
-            corner2 (Tuple[int, int]): Coordinate of area's second corner.
-
-        Returns:
-            List[Move]: List of moves within the sub-board.
+            List[str]: List of positions within the selected area (in GTP format).
         """
         x_c1, y_c1 = corner1
         x_c2, y_c2 = corner2
@@ -130,14 +110,15 @@ class Board:
         x_min, x_max = sorted((x_c1, x_c2))
         y_min, y_max = sorted((y_c1, y_c2))
 
-        kept_moves = list()
 
-        for move in self.game.moves:
-            x, y = move.pos
-            if x_min <= x <= x_max and y_min <= y <= y_max:
-                kept_moves.append(move)
-
-        return kept_moves
+        area = []
+        for x in range(x_min, x_max + 1):
+            for y in range(y_min, y_max + 1):
+                col = VALID_COLUMN_GTP[x]
+                line = str(self.size[1] - y)
+                area.append(col + line)
+        
+        return area
 
     def add_move(self, move: "Move"):
         """
