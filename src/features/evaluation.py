@@ -15,12 +15,17 @@ class Evaluator:
 
     def classify_move(self, turn: int) -> str:
         """
-        Docstring for classify_move
+        Classify the move in one of the following categories:
+            - BEST
+            - EXCELLENT
+            - GOOD
+            - INACCURACY
+            - MISTAKE
+            - BLUNDER
         
-        :param self: Description
-        :param turn: Description
+        :param turn: Turn of the move classified
         :type turn: int
-        :return: Description
+        :return: Classification ("BEST"/"EXCELLENT"/...)
         :rtype: str
         """
     
