@@ -17,12 +17,12 @@ class Evaluator:
         """
         Classify the move in one of the following categories.
 
-            - BEST
-            - EXCELLENT
-            - GOOD
-            - INACCURACY
-            - MISTAKE
-            - BLUNDER
+        - BEST
+        - EXCELLENT
+        - GOOD
+        - INACCURACY
+        - MISTAKE
+        - BLUNDER
 
         :param turn: Turn of the move classified.
         :type turn: int
@@ -59,16 +59,32 @@ class Evaluator:
         """
         Classify all moves of the game in one of the following categories.
 
-            - BEST
-            - EXCELLENT
-            - GOOD
-            - INACCURACY
-            - MISTAKE
-            - BLUNDER
+        - BEST
+        - EXCELLENT
+        - GOOD
+        - INACCURACY
+        - MISTAKE
+        - BLUNDER
 
-        :return: List of classifications (["BEST", "EXCELLENT", ...]).
+        :return: List of classifications (e.g.: ["BEST", "EXCELLENT", ...]).
         :rtype: List[str]
         :raises ValueError: If this is called before the analysis of the game.
         :raises ValueError: If the winrate loss of the turn is invalid.
         """
         return [self.classify_move(turn) for turn in range(len(self.analizer.game_analysis))]
+
+if __name__ == "__main__":
+    analizer = Analizer("games/sapindenoel_tronque.sgf")
+    evaluator = Evaluator(analizer)
+    analizer.shalow_game_analysis()
+    list_score_lead = analizer.game_score_lead()
+    list_classifications = evaluator.classify_game()
+
+    print("turn | scoreLead | classification")
+    for i, score_lead in enumerate(list_score_lead):
+        if i < 10:
+            print(f"{i}    | {score_lead} | {list_classifications[i]}")
+        elif i < 100:
+            print(f"{i}   | {score_lead} | {list_classifications[i]}")
+        else:
+            print(f"{i}  | {score_lead} | {list_classifications[i]}")
