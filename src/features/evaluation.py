@@ -30,6 +30,7 @@ class Evaluator:
         :rtype: str
         :raises ValueError: If this is called before the analysis of the game.
         :raises ValueError: If the value of turn is invalid.
+        :raises ValueError: If the winrate loss of the turn is invalid.
         """
         game_analysis = self.analizer.game_analysis
         if game_analysis is None:
@@ -38,7 +39,36 @@ class Evaluator:
         game_length = len(game_analysis)
         if turn >= game_length:
             raise ValueError(f"Evaluator.classify_move(turn) -- The value of turn is invalid for a game with {game_length} turns: {turn}")
+        
+        if turn == 0:
+            return "BEST"
+        
+        turn_winrate = game_analysis[turn]["rootInfo"]["winrate"]
+        previous_turn_winrate = game_analysis[turn - 1]["rootInfo"]["winrate"]
 
+        winrate_loss = previous_turn_winrate - turn_winrate
 
+        for classification in MOVE_CLASSIFICATION_BOUNDS.keys():
+            low, high = MOVE_CLASSIFICATION_BOUNDS[classification]
+            if low <= winrate_loss <= high:
+                return classification
 
+        raise ValueError(f"Evaluator.classify_move(turn) -- Invalid winrate loss for turn {turn}: {winrate_loss} (must be between -1.0 and 1.0)")
     
+    def classify_game(self) -> List[str]:
+        """
+        Classify all moves of the game in one of the following categories.
+
+            - BEST
+            - EXCELLENT
+            - GOOD
+            - INACCURACY
+            - MISTAKE
+            - BLUNDER
+
+        :return: List of classifications (["BEST", "EXCELLENT", ...]).
+        :rtype: List[str]
+        :raises ValueError: If this is called before the analysis of the game.
+        :raises ValueError: If the winrate loss of the turn is invalid.
+        """
+        return [self.classify_move(turn) for turn in range(len(self.analizer.game_analysis))]
