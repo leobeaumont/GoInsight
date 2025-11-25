@@ -13,4 +13,14 @@ class Evaluator:
     def __init__(self, analizer: Analizer):
         self.analizer = analizer
 
+    def classify_move(self, turn: int) -> str:
+        """
+        Docstring for classify_move
+        
+        :param self: Description
+        :param turn: Description
+        :type turn: int
+        :return: Description
+        :rtype: str
+        """
     

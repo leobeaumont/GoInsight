@@ -14,4 +14,5 @@ GoInsight documentation
    data/game
    data/move
    data/sgf
-   features/quality_metrics
+   features/analysis
+   features/evaluation
