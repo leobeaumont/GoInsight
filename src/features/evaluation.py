@@ -15,12 +15,30 @@ class Evaluator:
 
     def classify_move(self, turn: int) -> str:
         """
-        Docstring for classify_move
-        
-        :param self: Description
-        :param turn: Description
+        Classify the move in one of the following categories.
+
+            - BEST
+            - EXCELLENT
+            - GOOD
+            - INACCURACY
+            - MISTAKE
+            - BLUNDER
+
+        :param turn: Turn of the move classified.
         :type turn: int
-        :return: Description
+        :return: Classification ("BEST"/"EXCELLENT"/...).
         :rtype: str
+        :raises ValueError: If this is called before the analysis of the game.
+        :raises ValueError: If the value of turn is invalid.
         """
+        game_analysis = self.analizer.game_analysis
+        if game_analysis is None:
+            raise ValueError(f"Evaluator.classify_move(turn) -- Please run the game analysis before this method.")
+        
+        game_length = len(game_analysis)
+        if turn >= game_length:
+            raise ValueError(f"Evaluator.classify_move(turn) -- The value of turn is invalid for a game with {game_length} turns: {turn}")
+
+
+
     
