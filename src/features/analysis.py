@@ -184,6 +184,7 @@ class Analizer:
     def turn_basic_data(self, turn: int) -> Tuple[float, float, str, float]:
         """
         This function returns the basic infos to display on the analysis UI.
+        All data is from the perspective of the Analizer's selected player.
 
         Args:
             turn (int): Selected turn. 
@@ -207,6 +208,11 @@ class Analizer:
         score_lead = turn_analysis["rootInfo"]["scoreLead"]
         best_move, score_lead_best_move = [(move["move"], move["scoreLead"]) for move in turn_analysis["moveInfos"] if move["order"] == 0][0]
         next_player = "BW"[turn_analysis["rootInfo"]["currentPlayer"] == "B"]
+
+        if self.player == "W":
+            winrate = 1 - winrate
+            score_lead = -score_lead
+            score_lead_best_move = -score_lead_best_move
 
         return winrate, score_lead, best_move, score_lead_best_move, next_player
 

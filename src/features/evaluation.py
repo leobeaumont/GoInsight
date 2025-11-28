@@ -43,10 +43,14 @@ class Evaluator:
         if turn == 0:
             return "BEST"
         
+        player = game_analysis[turn]["rootInfo"]["currentPlayer"]
         turn_winrate = game_analysis[turn]["rootInfo"]["winrate"]
         previous_turn_winrate = game_analysis[turn - 1]["rootInfo"]["winrate"]
 
         winrate_loss = previous_turn_winrate - turn_winrate
+
+        if player == "W":
+            winrate_loss = - winrate_loss
 
         for classification in MOVE_CLASSIFICATION_BOUNDS.keys():
             low, high = MOVE_CLASSIFICATION_BOUNDS[classification]
