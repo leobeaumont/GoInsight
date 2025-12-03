@@ -1,3 +1,5 @@
+from typing import Dict, Tuple
+
 MODEL_DIR = "model"
 
 CONFIG_DIR = "configs"
@@ -7,3 +9,13 @@ TURN_ANALYSIS_CONFIG_PATH = "/".join([CONFIG_DIR, "deep_analysis.cfg"])
 
 NEURALNET_DIR = "neuralnet"
 NEURALNET_PATH = "/".join([NEURALNET_DIR, "g170e-b10c128-s1141046784-d204142634.bin.gz"])
+
+# Lower and upper bounds of winrate loss for each move classification
+MOVE_CLASSIFICATION_BOUNDS: Dict[str, Tuple[int, int]] = {
+    "BEST": (-1.0, -0.55),        # 5th percentile of winrate loss
+    "EXCELLENT": (-0.55, -0.2),   # 27.5th percentile of winrate loss
+    "GOOD": (-0.2, -0.02),        # 50th percentile of winrate loss
+    "INACCURACY": (-0.02, 0.002), # 85th percentile of winrate loss
+    "MISTAKE": (0.002, 0.01),     # 95th percentile of winrate loss
+    "BLUNDER": (0.01, 1.0)        # Above the 95th percentile of winrate loss
+    }

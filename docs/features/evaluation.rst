@@ -1,4 +1,4 @@
-.. autoclass:: src.features.quality_metrics.Analizer
+.. autoclass:: src.features.evaluation.Evaluator
    :members:
    :undoc-members:
    :show-inheritance:
