@@ -28,257 +28,214 @@ First, open a terminal in the directory you'd like to clone the project in.
 ```bash
 # Clone the repo
 git clone https://github.com/leobeaumont/GoInsight.git
+cd GoInsight
+```
+```bash
+# Setup the environement
+make setup
+```
+```bash
+# Activate the virtual environment
+source .venv/bin/activate
+```
+```bash
+# Download KataGo model
+make get-model
+```
+
+You're all setup !
+
+### Windows
+
+First, open PowerShell in the directory where you'd like to clone the project.
+
+```powershell
+# Clone the repo
+git clone https://github.com/leobeaumont/GoInsight.git
+cd ./GoInsight/
+```
+```powershell
+# Allow PowerShell scripts to run (first time only)
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+```powershell
+# Setup the environment
+.\make.ps1 setup
+```
+```powershell
+# Activate the virtual environment
+.\.venv\Scripts\Activate.ps1
+```
+```Powershell
+# Download KataGo model
+.\make.ps1 get-model
+```
+
+## Commands
+
+### Run KataGo in terminal
+
+This start an instance of KataGo, type gtp commands to interact with it.
+- Use `quit` command to close the instance
+- Use `list_commands` to get a list of all the commands
+
+#### Unix (Linux/MacOs)
+
+```bash
+make run-model
+```
+#### Windows
+
+```Powershell
+.\make.ps1 run-model
+```
+
+### Optimise KataGo for your device (optional)
+
+Start a batch of tests to find the best parameters (This will take a few minutes)
+
+#### Unix (Linux/MacOS)
+
+```bash
+make opt-model
+```
+#### Windows
+
+```Powershell
+.\make.ps1 opt-model
+```
+
+### Tests
+
+This will run all tests declared in the tests directory
+
+#### Unix (Linux/MacOS)
+
+```bash
+make tests
+```
+
+#### Windows
+
+```powershell
+.\make.ps1 tests
+```
+
+### Documentation
+
+This will open the project's documentation on your default web browser
+
+#### Unix (Linux/MacOS)
+
+```bash
+make docs
+```
+
+#### Windows
+
+```powershell
+.\make.ps1 docs
+```
+
+### Clean project
+
+Remove setup files and the virtual environment from the project
+
+#### Unix (Linux/MacOS)
+
+```bash
+make clean
+```
+
+#### Windows
+
+```powershell
+.\make.ps1 clean
+```
+
+## Contributing
+
+Contributions are not welcome yet, as this project is part of students cursus a `IMT Atltantique`. The project will be opened to contributors after the course ended.
+
+## Acknowledgements
+
+### Structures
+
+- `Tenuki` Brest Go association.
+- `IMT Atlantique` engineering school.
+- `KataGo` open ource Go engine.
+
+### Supervisors and clients
+
+- Coppin Gilles
+- Le Hir Mathieu
+- Peillard Étienne
+
+### Project members
+
+- Beaumont Léo (leo.beaumont@imt-atlantique.net)
+- Chambriard Léopold (leopold.chambriard@imt-atlantique.net)
+- Chouki Mouad (mouad.chouki@imt-atlantique.net)
+- Disdier Jordan (jordan.disdier@imt-atlantique.net)
+- Garrana Simon (simon.garrana@imt-atlantique.net)
+- Miranda-Gonzales Marcelo (marcelo.miranda-gonzales@imt-atlantique.net)
+- Roubertou Amaury (amaury.roubertou@imt-atlantique.net)
+
+## Contacts
+
+For any questions or supports, please contact leo.beaumont@imt-atlantique.net.
+
+## Features
+
 ### SGFTree
 
-`SgfTree` is a complete, structured representation of an SGF (Smart Game Format) file, the standard format used to describe board game records such as Go. It acts as the central interface to read, manipulate, compare, convert and write SGF trees while preserving the tree structure of the format.
+L’objet SgfTree est une représentation complète et structurée d’un fichier SGF (Smart Game Format), format standard utilisé pour décrire des parties de jeux de plateau comme le Go. Il sert d’interface centrale pour lire, manipuler, comparer, convertir et écrire des parties SGF, tout en conservant la structure en arbre propre à ce format.
 
-#### Internal representation of an SGF game
+#### Représentation interne d’une partie SGF
 
-A `SgfTree` represents a node of the SGF tree. Each node contains:
+Un SgfTree représente un noeud de l’arbre SGF.
+Chaque noeud contient :
 
-- a dictionary of SGF properties (`properties`) where each key (for example `B`, `W`, `SZ`, etc.) maps to a list of values;
-- a list of child nodes (`children`) used to represent variations.
+- un dictionnaire de propriétés SGF (properties), où chaque clé est un identifiant SGF (par exemple B, W, SZ, etc.) associé à une liste de valeurs,
 
-This structure models the mainline of a game, all variations and the exact order of moves and metadata.
+- une liste de nœuds enfants (children), permettant de représenter les variantes de jeu.
 
-#### Constructing a `SgfTree`
+Cette structure permet de modéliser fidèlement :
 
-A `SgfTree` can be created in several ways:
-- from an SGF file: `from_sgf(path)` reads and parses a file to build the tree;
-- from a `Game` object: `from_game(game)` converts internal game objects into an SGF tree;
-- by parsing an SGF string: `parse(input)` validates and parses an SGF string.
+- la ligne principale d’une partie,
 
-#### Conversion and serialization
+- les variantes et sous-variantes,
 
-`SgfTree` acts as a bridge:
-- to a `Game` object via `to_game()`;
-- to an SGF string or file via `to_sgf(path=None)` (writes to disk if `path` is provided).
+- l’ordre exact des coups et des métadonnées.
 
-Serialization handles escaping, variations and produces a syntactically valid SGF.
+#### Création d’un SgfTree
+Un SgfTree peut être créé de plusieurs manières :
+- Depuis un fichier SGF
+La méthode from_sgf(path) lit un fichier SGF sur le disque, vérifie son existence, puis le parse pour construire l’arbre correspondant.
 
-#### Accessing the move sequence
 
-`move_sequence()` extracts the ordered sequence of moves:
-- converts SGF moves to GTP notation;
-- auto-detects board size when needed;
-- returns moves as strings ("B A19") or tuples (("B", "A19")).
+- Depuis un objet Game
+La méthode from_game(game) permet de convertir un objet Game (logique interne du moteur) en arbre SGF, assurant ainsi une interopérabilité totale entre la représentation logique du jeu et le format SGF.
 
-This is useful to replay a game, interface with a Go engine, or display moves step-by-step.
 
-#### Board size handling
+- Par parsing direct d’une chaîne SGF
+La fonction parse(input) transforme une chaîne SGF brute en un SgfTree, en validant rigoureusement la syntaxe (parenthèses, propriétés, majuscules, délimiteurs, etc.).
 
-`get_board_size()` reads the `SZ` property from the root node and:
-- supports square and rectangular boards;
-- validates the size against a maximum limit;
-- returns a size usable by the engine.
 
-#### Robust SGF parsing
+#### Conversion vers d’autres formats
+Le SgfTree joue un rôle de pont entre différents formats :
+- Vers un objet Game
+La méthode to_game() reconstruit un objet Game à partir de l’arbre SGF, permettant ensuite de simuler la partie, l’analyser ou la modifier.
 
-The module includes a parser that:
-- validates the tree structure;
-- forbids lowercase property identifiers;
-- correctly handles escaped characters;
-- detects syntax errors (empty trees, incorrect delimiters, invalid format).
+- Vers une chaîne ou un fichier SGF
+La méthode to_sgf(path=None) sérialise l’arbre en une chaîne SGF valide.
+Si un chemin est fourni, le SGF est également écrit dans un fichier.
 
-This guarantees that any `SgfTree` produced from an SGF is structurally valid.
 
-### Move
+La sérialisation respecte les règles du SGF :
+- échappement des caractères spéciaux,
 
-The `Move` object represents a single move in a Go game. It encapsulates all information required to describe, validate and convert a move between internal, SGF and GTP formats.
-
-#### Structure and role
-
-A `Move` links:
-- a game (`Game`),
-- a color (black or white),
-- a board coordinate or a pass,
-- a move number.
-
-It is the basic unit to replay, export or analyze a game.
-
-#### Creation and validation
-
-- color can be provided (B/W) or inferred from the game state;
-- coordinates are validated against the associated `Board`;
-- a move without coordinates represents a pass.
-
-An attempt to play on an invalid coordinate raises an error.
-
-#### Coordinate conversions
-
-`Move` provides several conversion helpers:
-- `sgf_to_coord()` converts an SGF coordinate ("dd") to internal `(x, y)`;
-- `sgf_to_gtp()` converts SGF coordinates to GTP notation (A19, Q4, etc.) taking board size into account;
-- `from_gtp()` constructs a `Move` from a GTP command (e.g. "w A19").
-
-These conversions ensure interoperability with engines, GUIs and SGF files.
-
-#### Export
-
-- `to_gtp()` returns a valid GTP command for the move;
-- `to_sgf()` generates the corresponding SGF property (e.g. `{"B": ["dd"]}`).
-
-### Board
-
-`Board` represents the state of the Go board at a given time, built from a sequence of moves. It is responsible for spatial logic: stone placement, groups, liberties and captures.
-
-#### Responsibilities
-
-A `Board`:
-- maintains a matrix representation of the board;
-- enforces basic rules (liberties, captures);
-- supports local and global operations on the game state.
-
-#### Initialization
-
-- sizes the board (default 19×19);
-- reconstructs the state from a move list;
-- applies each move in order and updates captures.
-
-Any inconsistency in the move sequence is detected immediately.
-
-#### Position validation
-
-`is_valid_pos()` checks that a coordinate is within bounds and not already occupied.
-
-#### Move manipulation
-
-- `add_move()` places a stone and triggers capture detection;
-- `remove_move()` removes a stone (by reference or coordinates).
-
-These operations enable undo, editing and intermediate-state analysis.
-
-#### Local analysis utilities
-
-- `_neighbors()` returns orthogonally adjacent intersections;
-- `group_and_liberties()` identifies a connected group and its liberties.
-
-These methods are central to capture logic.
-
-#### Capture handling
-
-`update_board()`:
-- examines groups affected by a move;
-- detects groups with no liberties;
-- removes captured stones automatically.
-
-The implementation intentionally ignores advanced rule variations (ko, suicide rules, etc.) to remain robust and extensible.
-
-#### Area selection
-
-`area_selection_positions()` returns all intersections in a rectangular area (GTP notation). Useful for local analysis, engine integration and visualization.
-
-### Analizer
-
-`Analizer` is responsible for automatic analysis of a Go game using the KataGo engine. It is the central layer connecting the internal game representation (`Game`, `SgfTree`), the AI engine and the UI data.
-
-#### Role
-
-`Analizer` provides:
-- full-game analysis move-by-move;
-- deep analysis of a specific move;
-- extraction of quantitative indicators (winrate, score lead);
-- normalization of results from a given player's perspective (Black or White).
-
-#### Initialization
-
-On creation:
-- the SGF file is loaded and converted into an `SgfTree`;
-- the analyzed player (B/W) is fixed;
-- result storage structures are initialized.
-
-Invalid player values are rejected.
-
-#### Full-game analysis
-
-`shalow_game_analysis()`:
-- selects the KataGo binary for the current OS;
-- reconstructs the game from the SGF tree;
-- generates the JSON input expected by KataGo;
-- runs an analysis for each move;
-- collects and sorts the results.
-
-Results are stored in `game_analysis` and include, for each move: winrate, score lead, current player and recommended moves.
-
-#### Deep analysis of a move
-
-`deep_turn_analysis()` performs a deep search for a specific turn:
-- can restrict or exclude a spatial area;
-- increases search depth;
-- extracts best variations.
-
-Results are stored in `turn_analysis` indexed by move number.
-
-#### Global indicators
-
-`game_score_lead()` returns the score lead evolution through the game, ready for plotting and statistics.
-
-#### Basic data for UI
-
-`turn_basic_data()` provides the essential fields for a turn: winrate for the analyzed player, score lead, best suggested move and expected post-move score.
-
-### Evaluator
-
-`Evaluator` is responsible for grading moves using results from the `Analizer`.
-
-#### Role
-
-An `Evaluator`:
-- transforms numeric data (winrate) into qualitative judgments;
-- provides pedagogical, human-readable feedback;
-- applies a standard classification grid.
-
-#### Move classification
-
-`classify_move()`:
-- compares winrate before and after a move;
-- computes winrate loss (or gain);
-- adjusts sign based on the player who moved;
-- classifies the move into categories:
-
-BEST
-EXCELLENT
-GOOD
-INACCURACY
-MISTAKE
-BLUNDER
-
-Thresholds are defined in `MOVE_CLASSIFICATION_BOUNDS`.
-
-#### Full-game classification
-
-`classify_game()` applies the above logic to all moves and returns an aligned list of classifications for the whole game. This enables automatic annotations, pedagogical comments and performance statistics.
-
-### API
-
-`API` provides the external interface layer of the project. It exposes a simple JSON-oriented API designed to be consumed by a GUI or web client.
-
-#### Responsibilities
-
-- orchestrates `Analizer` and `Evaluator`;
-- hides KataGo and internal object complexity;
-- returns JSON-ready payloads.
-
-#### Full analysis on load
-
-`all_moves_analysis()`:
-- runs the full-game analysis;
-- classifies all moves;
-- aggregates data into a single JSON object.
-
-Returned data includes per-move details, qualitative classifications and score evolution for the whole game.
-
-#### Deep analysis with spatial filter
-
-`deep_turn_area_analysis()`:
-- runs a deep analysis for a given move with spatial filters;
-- returns only the best moves and variations;
-
-This is useful for interactive exploration, local analysis and teaching.
-
-#### Output format
-
-All API methods return well-formed JSON strings, directly consumable by a frontend and independent from internal engine objects.
+- gestion correcte des variantes,
 
 - génération d’un SGF syntaxiquement valide.
 
