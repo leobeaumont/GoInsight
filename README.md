@@ -71,6 +71,50 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 .\make.ps1 get-model
 ```
 
+## Open the technical documentation
+
+This will open the project's documentation on your default web browser
+
+#### Unix (Linux/MacOS)
+
+```bash
+make docs
+```
+
+#### Windows
+
+```powershell
+.\make.ps1 docs
+```
+
+
+## How to change KataGo model and neuralnet
+
+You can use any version of KataGo and any neuralnet configuration with GoInsight. The default configuration is made to work on any device.
+
+### Change model
+
+If you need help choosing the right model for your device, click [here](https://github.com/lightvector/KataGo#opencl-vs-cuda-vs-tensorrt-vs-eigen).
+
+You can choose the model you want to use from [here](https://github.com/lightvector/KataGo/releases). Simply copy the download link of the model zip of your choice and paste it as the new value of `MODEL_URL` in `Makefile` file at line 18 (for Windows user, do the same in the file `make.ps1` at line 42).
+
+If everything was done correctly, it should look like this:
+
+```makefile
+MODEL_URL = https://github.com/lightvector/KataGo/releases/download/[model version]/[name of model zip file]
+```
+
+### Change neuralnet
+
+Changing the neuralet is the easiest way to balance speed and performance when using GoInsight. You can choose the neuralnet you want from [here](https://katagoarchive.org/g170/neuralnets/index.html). Simply copy the download link of the neuralnet `tar.gz` file of your choice and paste it as the new value of `NEURALNET_URL` in `Makefile` file at line 21 (for Windows user, do the same in the file `make.ps1` at line 45). You must also change the value of `NEURALNET_FILE` with the new `tar.gz` file name at line 20 in `Makefile` (and at line 44 of `make.ps1` for Windows users).
+
+If everything was done correctly, it should look like this:
+
+```bash
+NEURALNET_FILE = $(NEURALNET_DIR)/[name of the neuralnet tar.gz file]
+NEURALNET_URL = https://katagoarchive.org/[neuralnet generation]/neuralnets/[name of the neuralnet tar.gz file]
+```
+
 ## Commands
 
 ### Run KataGo in terminal
@@ -119,22 +163,6 @@ make tests
 
 ```powershell
 .\make.ps1 tests
-```
-
-### Documentation
-
-This will open the project's documentation on your default web browser
-
-#### Unix (Linux/MacOS)
-
-```bash
-make docs
-```
-
-#### Windows
-
-```powershell
-.\make.ps1 docs
 ```
 
 ### Clean project

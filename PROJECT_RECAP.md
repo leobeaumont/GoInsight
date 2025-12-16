@@ -12,13 +12,13 @@
 - **Readability principle**: public signatures favor explicit parameters (player color, move number to analyze, GTP selection) to limit side effects and make calls from other languages easier.
 
 ## Analysis Workflow
-- **Two-level analysis**: a “broad” pass over the entire game to establish context, followed by “deep” analyses per move to zoom in on key decisions, optimizing computation time without sacrificing precision on important sequences.
+- **Two-level analysis**: a “broad” pass over the entire game to establish context, followed by “deep” analysis per move to zoom in on key decisions, optimizing computation time without sacrificing precision on important sequences.
 - **Board area selection**: targeted analysis accepts lists of allowed or forbidden moves; explicit allow/avoid inversion provides fine-grained control to focus on local fights without external noise.
-- **Explicit limits**: the number of variations and sequence length are capped to ensure results remain usable for human players and to avoid combinatorial explosion on the engine side.
+- **Explicit limits**: the number of variations and sequence length are capped to ensure results remain usable for human players.
 - **Player perspective**: all metrics are re-centered on the analyzed color, ensuring consistent interpretation of winrate and score regardless of the protagonist.
 
 ## User Experience Choices
-- **Error typology**: the classes BEST / EXCELLENT / GOOD / INACCURACY / MISTAKE / BLUNDER represent winrate loss thresholds designed to speak to players, distinguishing between minor inaccuracies and major blunders while aligning with pedagogical expectations.
+- **Error typology**: the classes BEST / EXCELLENT / GOOD / INACCURACY / MISTAKE / BLUNDER represent winrate loss thresholds designed to speak to players, distinguishing between minor inaccuracies and major blunders while aligning with pedagogical expectations. This classes are calculated using score-lead variations in a dataset of real games with representative levels of play.
 - **Visual highlights**: the notion of an “important square” and the option to ignore a zone are built in from the start to guide attention rather than overwhelm users with variations.
 - **Game narrative**: quick access to score lead per move helps contextualize swings and connect KataGo annotations to a simple story (where the game turns, who gains the advantage, when it is lost).
 
@@ -26,10 +26,11 @@
 - **Centralized paths**: model directories, neural network weights, and configuration files are defined in a constants module, avoiding duplication and simplifying KataGo or model version migrations.
 - **Documented thresholds**: move classification boundaries are grouped in a single table, making pedagogical calibration easier without diving back into algorithms.
 - **Dedicated configurations**: separate files drive fast whole-game analysis and deep per-move analysis, allowing independent tuning of compute budgets depending on use case (full review vs. local study).
-- **Cross-platform compatibility**: KataGo binary resolution is OS-dependent to avoid divergent scripts between macOS, Linux, and Windows, reducing user support overhead.
+- **Cross-platform compatibility**: KataGo binary resolution is OS-dependent to avoid divergent scripts between macOS, Linux, and Windows, GoInsight handle the different OS possibilities.
 
 ## Reliability and Maintainability
 - **Input validation**: systematic checks (valid color, move within game range, prior analysis performed) prevent silent errors and ensure predictable behavior when integrated into other tools.
+- **Extensive testing**: features and function are unit-tested, and the battery of tests can be launched with the simple `make tests` command to ensure code conformity and behavior.
 - **Effect isolation**: the distinction between immutable global analysis and per-move stored local analyses avoids unnecessary recomputation and reduces the risk of result corruption.
 - **Transparent workflows**: exchanges with KataGo use readable, sorted JSON, facilitating debugging (line-by-line inspection) and reproducibility of analysis sessions.
 
