@@ -189,342 +189,366 @@ For any questions or supports, please contact leo.beaumont@imt-atlantique.net.
 
 ### SGFTree
 
-L’objet SgfTree est une représentation complète et structurée d’un fichier SGF (Smart Game Format), format standard utilisé pour décrire des parties de jeux de plateau comme le Go. Il sert d’interface centrale pour lire, manipuler, comparer, convertir et écrire des parties SGF, tout en conservant la structure en arbre propre à ce format.
+The SgfTree object is a complete and structured representation of an SGF (Smart Game Format) file, a standard format used to describe games of board games like Go. It serves as a central interface for reading, manipulating, comparing, converting, and writing SGF games, while preserving the tree structure inherent to this format.
 
-#### Représentation interne d’une partie SGF
+#### Internal Representation of an SGF Game
 
-Un SgfTree représente un noeud de l’arbre SGF.
-Chaque noeud contient :
+An SgfTree represents a node of the SGF tree.
+Each node contains:
 
-- un dictionnaire de propriétés SGF (properties), où chaque clé est un identifiant SGF (par exemple B, W, SZ, etc.) associé à une liste de valeurs,
+- a dictionary of SGF properties, where each key is an SGF identifier (e.g., B, W, SZ, etc.) associated with a list of values,
 
-- une liste de nœuds enfants (children), permettant de représenter les variantes de jeu.
+- a list of child nodes, allowing the representation of game variants.
 
-Cette structure permet de modéliser fidèlement :
+This structure allows for the accurate modeling of:
 
-- la ligne principale d’une partie,
+- the main line of a game,
 
-- les variantes et sous-variantes,
+- variants and sub-variants,
 
-- l’ordre exact des coups et des métadonnées.
+- the exact order of moves and metadata.
 
-#### Création d’un SgfTree
-Un SgfTree peut être créé de plusieurs manières :
-- Depuis un fichier SGF
-La méthode from_sgf(path) lit un fichier SGF sur le disque, vérifie son existence, puis le parse pour construire l’arbre correspondant.
+#### Creating an SGF Tree
+An SGF tree can be created in several ways:
 
+- From an SGF file
+The `from_sgf(path)` method reads an SGF file from disk, checks for its existence, and then parses it to construct the corresponding tree.
 
-- Depuis un objet Game
-La méthode from_game(game) permet de convertir un objet Game (logique interne du moteur) en arbre SGF, assurant ainsi une interopérabilité totale entre la représentation logique du jeu et le format SGF.
+- From a Game object
+The `from_game(game)` method converts a Game object (internal engine logic) into an SGF tree, thus ensuring complete interoperability between the game's logical representation and the SGF format.
 
+- By directly parsing an SGF string
+The `parse(input)` function transforms a raw SGF string into an SGF tree, rigorously validating the syntax (parentheses, properties, capitalization, delimiters, etc.).
 
-- Par parsing direct d’une chaîne SGF
-La fonction parse(input) transforme une chaîne SGF brute en un SgfTree, en validant rigoureusement la syntaxe (parenthèses, propriétés, majuscules, délimiteurs, etc.).
+#### Conversion to Other Formats
+The SgfTree acts as a bridge between different formats:
 
+- To a Game object
+The `to_game()` method reconstructs a Game object from the SGF tree, allowing you to then simulate, analyze, or modify the game.
 
-#### Conversion vers d’autres formats
-Le SgfTree joue un rôle de pont entre différents formats :
-- Vers un objet Game
-La méthode to_game() reconstruit un objet Game à partir de l’arbre SGF, permettant ensuite de simuler la partie, l’analyser ou la modifier.
+- To an SGF string or file
+The `to_sgf(path=None)` method serializes the tree into a valid SGF string.
 
-- Vers une chaîne ou un fichier SGF
-La méthode to_sgf(path=None) sérialise l’arbre en une chaîne SGF valide.
-Si un chemin est fourni, le SGF est également écrit dans un fichier.
+If a path is provided, the SGF is also written to a file.
 
+The serialization adheres to SGF rules:
 
-La sérialisation respecte les règles du SGF :
-- échappement des caractères spéciaux,
+- escaping of special characters,
 
-- gestion correcte des variantes,
+- correct handling of variants,
 
-- génération d’un SGF syntaxiquement valide.
+- generation of a syntactically valid SGF.
 
+#### Accessing the Move Sequence
+The `move_sequence()` method extracts the sequence of moves played, in order, from the tree:
 
-#### Accès à la séquence de coups
-La méthode move_sequence() permet d’extraire la suite des coups joués, dans l’ordre, à partir de l’arbre :
-- les coups sont convertis du format SGF vers le format GTP,
+- Moves are converted from SGF format to GTP format,
 
-- la taille du plateau est automatiquement détectée si nécessaire,
+- The board size is automatically detected if necessary,
 
-- les coups peuvent être retournés soit sous forme de chaînes ("B A19"), soit sous forme de tuples (("B", "A19")).
+- Moves can be returned either as strings ("B A19") or as tuples ("B", "A19").
 
-Cette méthode est particulièrement utile pour :
-- rejouer une partie,
+This method is particularly useful for:
 
-- interfacer avec un moteur de Go,
+- Replaying a game,
 
-- analyser ou afficher une partie coup par coup.
+- Interfacing with a Go engine,
 
-#### Gestion de la taille du plateau
-La méthode get_board_size() extrait la taille du plateau à partir de la propriété SZ du nœud racine :
-- elle supporte les formats carrés et rectangulaires,
+- Analyzing or displaying a game move by move.
 
-- elle valide les tailles par rapport à une constante maximale,
+#### Managing the Board Size
+The `get_board_size()` method extracts the board size from the `SZ` property of the root node:
 
-- elle garantit que la taille retournée est cohérente et exploitable.
+- It supports square and rectangular formats,
 
-#### Parsing SGF robuste
-Le module inclut un parseur SGF complet qui :
-- valide la structure des arbres,
+- It validates sizes against a maximum constant,
 
-- interdit les propriétés en minuscules,
+- It guarantees that the returned size is consistent and usable.
 
-- gère correctement les caractères échappés,
+#### Robust SGF Parsing
+The module includes a complete SGF parser that:
 
-- détecte les erreurs de syntaxe (arbres vides, délimiteurs incorrects, format invalide).
+- validates tree structure,
 
-Cela garantit que tout SgfTree créé à partir d’un SGF est structurellement valide.
+- prohibits lowercase properties,
 
-### Classe Move
-L’objet Move représente un coup individuel dans une partie de Go. Il encapsule toutes les informations nécessaires pour décrire, interpréter, valider et convertir un coup entre différents formats standards (interne, SGF et GTP).
-Rôle général
+- correctly handles escaped characters,
 
-#### Un Move relie :
-- une partie (Game),
+- detects syntax errors (empty trees, incorrect delimiters, invalid format).
 
-- une couleur (noir ou blanc),
+This ensures that any SgfTree created from an SGF is structurally valid.
 
-- une position sur le plateau ou un pass,
+### Move Class
+The Move object represents an individual move in a game of Go. It encapsulates all the information necessary to describe, interpret, validate, and convert a move between different standard formats (internal, SGF, and GTP).
 
-- un numéro de tour dans la partie.
+General Role
 
-Il constitue ainsi l’unité de base permettant de rejouer une partie, de l’exporter ou de l’analyser.
+#### A Move links:
 
-#### Création et validation d’un coup
+- a game,
 
-Lors de l’instanciation :
+- a color (black or white),
 
-- la couleur peut être fournie explicitement (B / W), sinon elle est déduite automatiquement à partir de l’état de la partie,
+- a position on the board or a pass,
 
-- la position est validée à l’aide du plateau associé au jeu,
+- a turn number in the game.
 
-- un coup sans position correspond à un pass.
-Toute tentative de jouer sur une position invalide provoque une erreur, garantissant la cohérence de la partie.
+It thus constitutes the basic unit for replaying, exporting, or analyzing a game.
 
-#### Conversion entre formats de coordonnées
+#### Creating and Validating a Move
 
-La classe Move fournit plusieurs méthodes de conversion essentielles :
+During instantiation:
 
-- SGF -> coordonnées internes
- sgf_to_coord() traduit une position SGF ("dd") en coordonnées (x, y) utilisables par le moteur.
+- The color can be explicitly provided (B/W), otherwise it is automatically deduced from the game state,
+
+- The position is validated using the game board,
+
+- A move without a position corresponds to a pass.
+Any attempt to play on an invalid position results in an error, ensuring the game's consistency.
+
+#### Conversion Between Coordinate Formats
+
+The Move class provides several essential conversion methods:
+
+- SGF -> Internal Coordinates
+
+sgf_to_coord() translates an SGF position ("dd") into coordinates (x, y) usable by the engine.
 
 - SGF -> GTP
- sgf_to_gtp() convertit une coordonnée SGF en notation GTP (A19, Q4, etc.), en tenant compte de la taille du plateau et du cas particulier du pass.
+sgf_to_gtp() converts an SGF coordinate into GTP notation (A19, Q4, etc.), taking into account the board size and the specific case of a pass.
 
 - GTP -> Move
- from_gtp() permet de créer directement un objet Move à partir d’une instruction GTP standard ("w A19"), en validant la syntaxe et les coordonnées.
+`from_gtp()` allows you to directly create a Move object from a standard GTP instruction ("w A19"), validating the syntax and coordinates.
 
-Ces conversions assurent l’interopérabilité avec :
-- les moteurs de Go,
+These conversions ensure interoperability with:
 
-- les interfaces graphiques,
+- Go engines,
 
-- les fichiers SGF.
+- Graphical interfaces,
 
-#### Export du coup
-Un Move peut être exporté sous différents formats :
+- SGF files.
 
-- Vers GTP
-to_gtp() retourne une commande GTP valide représentant le coup.
+#### Exporting a Move
+A move can be exported in different formats:
 
+- To GTP
+`to_gtp()` returns a valid GTP command representing the move.
 
-- Vers SGF
-to_sgf() génère la propriété SGF correspondante ({"B": ["dd"]}), directement exploitable dans un arbre SGF.
+- To SGF
+`to_sgf()` generates the corresponding SGF property (`{"B": ["dd"]}`), which can be directly used in an SGF tree.
 
-### Classe Board
-L’objet Board représente l’état du plateau de Go à un instant donné, construit à partir d’une séquence de coups. Il est responsable de toute la logique spatiale : placement des pierres, groupes, libertés et captures.
-#### Rôle général
-Un Board :
-- maintient une représentation matricielle du plateau,
+### Board Class
+The Board object represents the state of the Go board at a given moment, constructed from a sequence of moves. It is responsible for all the spatial logic: stone placement, groups, liberties, and captures.
 
-- applique les règles fondamentales du Go (libertés, captures),
+#### General Role
+A Board:
 
-- permet des opérations locales et globales sur l’état du jeu.
+- maintains a matrix representation of the board,
 
-Il constitue le socle de la logique de jeu.
-#### Initialisation du plateau
-Lors de sa création :
-- le plateau est dimensionné (par défaut 19×19),
+- applies the fundamental rules of Go (liberties, captures),
 
-- la liste des coups est utilisée pour reconstruire l’état du jeu,
+- allows local and global operations on the game state.
 
-- chaque coup est joué dans l’ordre avec mise à jour automatique des captures.
+It forms the basis of the game logic.
+#### Board Initialization
+Upon creation:
 
-Toute incohérence dans la séquence de coups est détectée immédiatement.
-#### Validation des positions
-La méthode is_valid_pos() vérifie :
-- que la position est dans les limites du plateau,
+- the board is sized (19×19 by default),
 
-- qu’elle n’est pas déjà occupée.
+- the move list is used to reconstruct the game state,
 
-Elle est utilisée aussi bien pour jouer que pour retirer des coups, garantissant l’intégrité du plateau.
-#### Manipulation des coups
-Le plateau peut être modifié dynamiquement :
-- Ajout d’un coup
-add_move() place une pierre et déclenche la détection des captures.
+- each move is played in order with automatic updating of the captures.
 
-- Suppression d’un coup
-remove_move() enlève une pierre, soit par référence directe, soit par coordonnées.
+Any inconsistency in the move sequence is detected immediately.
 
-Ces opérations permettent par exemple :
-- le retour en arrière,
+#### Position Validation
+The `is_valid_pos()` method checks:
 
-- l’édition d’une partie,
+- that the position is within the board boundaries,
 
-- l’analyse de positions intermédiaires.
+- that it is not already occupied.
 
-#### Analyse locale du plateau
+It is used both to play and to remove moves, guaranteeing the integrity of the board.
 
-Le plateau fournit des outils d’analyse essentiels :
-- Voisinage orthogonal
-_neighbors() retourne les intersections adjacentes selon la connectivité du Go.
+#### Move Manipulation
+The board can be modified dynamically:
 
-- Groupes et libertés
-group_and_liberties() identifie :
+- Adding a move
+`add_move()` places a stone and triggers capture detection.
 
-- un groupe de pierres connectées,
+- Removing a move
+`remove_move()` removes a stone, either by direct reference or by coordinates.
 
-- l’ensemble de ses libertés.
+These operations allow, for example:
 
+- going back,
 
-Cette méthode est au cœur de la logique de capture.
-#### Gestion des captures
-La méthode update_board() :
-- examine les groupes affectés par un coup,
+- editing a game,
 
-- détecte ceux qui n’ont plus de libertés,
+- analyzing intermediate positions.
 
-- retire automatiquement les pierres capturées.
+#### Local Board Analysis
 
-Cette implémentation est volontairement agnostique des règles avancées (ko, suicide interdit, etc.), ce qui la rend robuste et facilement extensible.
-#### Sélection de zones
-La méthode area_selection_positions() permet d’extraire toutes les intersections d’une zone rectangulaire du plateau, en notation GTP.
-Elle est particulièrement utile pour :
+The board provides essential analysis tools:
 
-- l’analyse locale,
+- Orthogonal Neighborhood
+`_neighbors()` returns adjacent intersections according to Go connectivity.
 
-- l’intégration avec des moteurs,
+- Groups and Freedoms
+`group_and_liberties()` identifies:
 
-- des outils de visualisation ou de statistiques.
+- a group of connected stones,
 
+- the set of its freedoms.
 
-### Classe Analizer
-L’objet Analizer est responsable de l’analyse automatique d’une partie de Go à l’aide du moteur KataGo.
-Il constitue la couche centrale reliant :
-- la représentation interne du jeu (Game, SgfTree),
+This method is at the heart of the capture logic.
 
-- le moteur d’IA externe,
+#### Capture Management
+The update_board() method:
 
-- les données nécessaires à l’interface utilisateur.
+- examines the groups affected by a move,
 
+- detects those that have run out of liberties,
 
-#### Rôle général
-Un Analizer permet :
-- d’analyser toute la partie coup par coup (analyse globale),
+- automatically removes captured stones.
 
-- d’effectuer une analyse approfondie d’un coup précis,
+This implementation is intentionally agnostic to advanced rules (KO, suicide forbidden, etc.), making it robust and easily extensible.
 
-- d’extraire des indicateurs quantitatifs (winrate, score lead),
+#### Area Selection
+The area_selection_positions() method extracts all intersections of a rectangular area of ​​the board, using GTP notation.
 
-- de normaliser les résultats du point de vue d’un joueur donné (Noir ou Blanc).
+It is particularly useful for:
 
-#### Initialisation
+- local analysis,
 
-Lors de sa création :
-- le fichier SGF est chargé et converti en SgfTree,
+- integration with engines,
 
-- le joueur analysé (B ou W) est fixé,
+- visualization or statistical tools.
 
-- les structures de stockage des résultats sont initialisées.
+### Analyst Class
+The Analyst object is responsible for the automatic analysis of a Go game using the KataGo engine.
 
-Toute valeur invalide pour le joueur est immédiatement rejetée.
+It forms the central layer connecting:
 
-#### Analyse globale de la partie
-La méthode shalow_game_analysis() :
-- sélectionne automatiquement le binaire KataGo selon le système d’exploitation,
+- the internal game representation (Game, SgfTree),
 
-- reconstruit la partie à partir de l’arbre SGF,
+- the external AI engine,
 
-- génère l’entrée JSON attendue par KataGo,
+- the data required for the user interface.
 
-- lance une analyse pour chaque tour de la partie,
+#### General Role
+An Analyzer allows you to:
 
-- collecte et trie les résultats.
+- analyze the entire game move by move (global analysis),
 
+- perform an in-depth analysis of a specific move,
 
-Le résultat est stocké dans game_analysis et contient, pour chaque coup :
-- winrate,
+- extract quantitative indicators (win rate, score lead),
+
+- normalize the results from the perspective of a given player (Black or White).
+
+#### Initialization
+
+During its creation:
+
+- the SGF file is loaded and converted into an SgfTree,
+
+- the analyzed player (Black or White) is set,
+
+- the result storage structures are initialized.
+
+Any invalid value for the player is immediately rejected.
+
+#### Overall Game Analysis
+The shalow_game_analysis() method:
+
+- automatically selects the KataGo binary based on the operating system,
+
+- reconstructs the game from the SGF tree,
+
+- generates the JSON input expected by KataGo,
+
+- runs an analysis for each turn of the game,
+
+- collects and sorts the results.
+
+The result is stored in game_analysis and contains, for each move:
+
+- win rate,
 
 - score lead,
 
-- joueur courant,
+- current player,
 
-- coups recommandés par l’IA.
+- moves recommended by the AI.
 
-Cette analyse constitue la base de toutes les autres fonctionnalités.
+This analysis forms the basis of all other features.
 
-#### Analyse approfondie d’un coup
+#### In-Depth Move Analysis
 
-La méthode deep_turn_analysis() permet d’analyser un tour spécifique en profondeur :
-- avec éventuellement une restriction spatiale (zone autorisée ou interdite),
+The deep_turn_analysis() method allows for in-depth analysis of a specific turn:
 
-- avec une profondeur de recherche plus importante,
+- optionally with a spatial restriction (allowed or forbidden zone),
 
-- en extrayant les meilleures variantes possibles.
+- with a greater search depth,
 
-Les résultats sont stockés dans turn_analysis, indexés par numéro de tour.
+- by extracting the best possible variations.
 
-#### Extraction d’indicateurs globaux
-game_score_lead() retourne l’évolution du score tout au long de la partie,
+The results are stored in `turn_analysis`, indexed by turn number.
 
-les données sont prêtes à être utilisées pour des graphiques ou statistiques.
+#### Extracting Global Indicators
+`game_score_lead()` returns the score evolution throughout the game.
 
-#### Données de base pour l’interface
-La méthode turn_basic_data() fournit les informations essentielles à afficher pour un tour donné :
-- winrate du joueur analysé,
+The data is ready to be used for graphs or statistics.
 
-- score lead du joueur analysé,
+#### Basic Data for the Interface
+The `turn_basic_data()` method provides the essential information to display for a given turn:
 
-- meilleur coup proposé par KataGo,
+- win rate of the analyzed player,
 
-- score attendu après ce coup,
+- Lead score of the analyzed player,
 
-- joueur devant jouer le coup suivant.
+- Best move suggested by KataGo,
 
-Toutes les valeurs sont normalisées du point de vue du joueur sélectionné, ce qui simplifie fortement l’affichage.
-#### Données avancées pour l’interface
-La méthode turn_advanced_data() retourne :
+- Expected score after this move,
 
-- une liste ordonnée des meilleurs coups,
+- Player who should play the next move.
 
-- leur score attendu,
+All values ​​are normalized from the perspective of the selected player, which greatly simplifies the display.
 
-- une variation principale tronquée.
+#### Advanced Data for the Interface
+The turn_advanced_data() method returns:
 
+- An ordered list of the best moves,
 
-Ces données sont destinées à un affichage détaillé ou interactif.
+- Their expected score,
 
-### Classe Evaluator
-L’objet Evaluator est chargé de qualifier la qualité des coups joués à partir des résultats fournis par l’Analizer.
+- A truncated main variation.
 
-#### Rôle général
+This data is intended for detailed or interactive display.
 
-Un Evaluator :
-- transforme des données numériques (winrate) en jugements qualitatifs,
+### Evaluator Class
+The Evaluator object is responsible for assessing the quality of the moves played based on the results provided by the Analyzer.
 
-- fournit une lecture humaine et pédagogique de la partie,
+#### General Role
 
-- applique une grille de classification standard.
+An Evaluator:
+- Transforms numerical data (win rate) into qualitative judgments,
 
-#### Classification d’un coup
-La méthode classify_move() :
-- compare le winrate avant et après un coup,
+- Provides a human and educational interpretation of the game,
 
-- calcule la perte (ou le gain) de winrate,
+- Applies a standard classification grid.
 
-- corrige le signe selon le joueur qui a joué,
+#### Move Classification
+The classify_move() method:
 
-- classe le coup dans une catégorie :
+- compares the win rate before and after a move,
+
+- calculates the win rate loss (or gain),
+
+- corrects the sign according to the player who played,
+
+- classifies the move into a category:
 
 BEST
 EXCELLENT
@@ -533,72 +557,74 @@ INACCURACY
 MISTAKE
 BLUNDER
 
-Les seuils de classification sont définis dans MOVE_CLASSIFICATION_BOUNDS.
+Classification thresholds are defined in MOVE_CLASSIFICATION_BOUNDS.
 
-#### Classification de toute la partie
+#### Entire Game Classification
 
-La méthode classify_game() applique cette logique à tous les coups de la partie et retourne une liste alignée avec les tours du jeu.
-Cette classe permet donc de produire :
-- des annotations automatiques,
+The classify_game() method applies this logic to all moves in the game and returns a list aligned with the game's turns.
+This class therefore allows for the production of:
 
-- des commentaires pédagogiques,
+- automatic annotations,
 
-- des statistiques de performance.
+- educational comments,
 
-### Classe API
-La classe API constitue la couche d’interface externe du projet.
-Elle expose une API simple, orientée consommation par une interface graphique ou un client web.
-#### Rôle général
-L’API :
+- performance statistics.
 
-- orchestre Analizer et Evaluator,
+### API Class
+The API class constitutes the external interface layer of the project.
 
-- masque la complexité de KataGo et des structures internes,
+It exposes a simple API, designed for consumption through a graphical interface or a web client.
 
-- retourne uniquement des données JSON prêtes à l’emploi.
+#### General Role
+The API:
 
+- orchestrates the Analyzer and Evaluator,
 
-#### Analyse complète au chargement
-La méthode all_moves_analysis() :
+- hides the complexity of KataGo and its internal structures,
 
-- lance l’analyse globale de la partie,
+- returns only ready-to-use JSON data.
 
-- classe tous les coups,
+#### Full Analysis on Load
+The all_moves_analysis() method:
 
-- regroupe toutes les données dans un seul objet JSON.
+- launches the overall analysis of the game,
 
-Les données retournées incluent :
+- classifies all moves,
 
-- les informations détaillées par tour,
+- groups all data into a single JSON object.
 
-- la classification qualitative de chaque coup,
+The returned data includes:
 
-- l’évolution du score sur toute la partie.
+- detailed information per turn,
 
-Cette méthode est conçue pour être appelée au chargement initial d’une analyse.
+- the qualitative classification of each move,
 
-#### Analyse approfondie avec filtre spatial
-La méthode deep_turn_area_analysis() :
+- the score evolution over the entire game.
 
-- lance une analyse approfondie d’un coup donné,
+This method is designed to be called upon the initial load of an analysis.
 
-- permet de limiter ou d’exclure une zone du plateau,
+#### In-Depth Analysis with Spatial Filtering
+The deep_turn_area_analysis() method:
 
-- retourne uniquement les meilleurs coups et variantes.
+- launches an in-depth analysis of a given move,
 
-Cette fonctionnalité est idéale pour :
+- allows limiting or excluding an area of ​​the board,
 
-- l’exploration interactive,
+- returns only the best moves and variations.
 
-- l’analyse locale,
+This feature is ideal for:
 
-- l’enseignement et le commentaire de parties.
+- interactive exploration,
 
+- local analysis,
 
-#### Format de sortie
-Toutes les méthodes de l’API retournent :
-- des chaînes JSON bien formatées,
+- teaching and commenting on games.
 
-- directement exploitables par un frontend,
+#### Output Format
+All API methods return:
 
-- sans dépendance aux objets internes du moteur.
+- well-formatted JSON strings,
+
+- directly usable by a frontend,
+
+- without any dependency on internal engine objects.
