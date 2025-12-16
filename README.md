@@ -425,8 +425,8 @@ It is particularly useful for:
 
 - visualization or statistical tools.
 
-### Analyst Class
-The Analyst object is responsible for the automatic analysis of a Go game using the KataGo engine.
+### Analyzer Class
+The Analyzer object is responsible for the automatic analysis of a Go game using the KataGo engine.
 
 It forms the central layer connecting:
 
@@ -566,8 +566,6 @@ This class therefore allows for the production of:
 
 - automatic annotations,
 
-- educational comments,
-
 - performance statistics.
 
 ### API Class
@@ -580,7 +578,7 @@ The API:
 
 - orchestrates the Analyzer and Evaluator,
 
-- hides the complexity of KataGo and its internal structures,
+- hides the complexity of GoInsight and its internal structures,
 
 - returns only ready-to-use JSON data.
 
@@ -615,6 +613,8 @@ The deep_turn_area_analysis() method:
 This feature is ideal for:
 
 - interactive exploration,
+
+- analyze a specific area of the game,
 
 - local analysis,
 
