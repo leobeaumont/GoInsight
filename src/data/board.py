@@ -93,7 +93,7 @@ class Board:
 
         x, y = pos
         x_size, y_size = size
-
+        
         if x < 0 or y < 0:
             return False
         elif x >= x_size or y >= y_size:
@@ -146,6 +146,7 @@ class Board:
         x, y = move.pos
         self.board[y][x] = move
         self.update_board(move.pos)
+        self.game.moves.append(move)
 
     def remove_move(self, move: Optional["Move"] = None, pos: Optional[Tuple[int, int]] = None):
         """
@@ -236,40 +237,55 @@ class Board:
     
     def update_board(self, pos: Tuple[int, int]):
         """
-        Detect and remove all captured groups from the board.
-        The detection is only local around the move played.
-
-        A captured group is any set of stones with zero liberties.
-        The function scans the entire board, evaluates each group once,
-        removes the ones without liberties, and returns their coordinates.
-
-        This function is rule-agnostic: it also removes self-captured stones.
-
-        :param pos: Position of the move triggering the update.
-        :type pos: tuple[int, int]
-
-        :returns: Sorted list of coordinates of all stones removed during the capture resolution.
-        :rtype: list[tuple[int, int]]
+        Detect and resolve captures.
+        
+        Logic Order (Crucial for Go rules):
+        1. Check enemy neighbors. If dead, remove them.
+        2. Check self. If dead (and no enemies were removed), it is Suicide.
         """
-        to_remove = set()
-        visited = set()
-
         x, y = pos
-        to_test = [pos] + [pos for pos in self._neighbors(x, y)]
-         
+        current_stone = self.board[y][x]
+        
+        # Safety check
+        if current_stone is None:
+            return
 
-        for x, y in to_test:
-            if self.board[y][x] is None:
+        current_color = current_stone.color.lower()
+        
+        # Track captured stones to return later (optional, but good practice)
+        captured_stones = [] 
+
+        # --- STEP 1: Check Enemy Neighbors ---
+        # We look at neighbors to find opponent groups that just died.
+        for nx, ny in self._neighbors(x, y):
+            neighbor_stone = self.board[ny][nx]
+            
+            # Skip empty spots or own stones
+            if neighbor_stone is None or neighbor_stone.color.lower() == current_color:
                 continue
-            if (x, y) in visited:
-                continue
 
-            group, liberties = self.group_and_liberties((x, y))
-            visited.update(group)
-
+            # It is an enemy. Check if this group is now dead.
+            group, liberties = self.group_and_liberties((nx, ny))
+            
             if len(liberties) == 0:
-                to_remove.update(group)
+                # CAPTURE! Remove them IMMEDIATELY.
+                # This creates new liberties for the stone we just played.
+                for gx, gy in group:
+                    self.remove_move(pos=(gx, gy))
+                    captured_stones.append((gx, gy))
 
-        # Remove captured stones
-        for pos in to_remove:
+        # --- STEP 2: Check Self (Suicide Rule) ---
+        # Now that enemies are gone, check if WE are dead.
+        my_group, my_liberties = self.group_and_liberties((x, y))
+        
+        if len(my_liberties) == 0:
+            # If we have 0 liberties here, it means we captured nothing
+            # and played into a spot with no air. This is SUICIDE.
+            
+            # 1. Revert the move (take the stone back off)
             self.remove_move(pos=pos)
+
+            # 2. Raise error so the GUI knows to NOT swap turns
+            raise ValueError(f"Move at {pos} is suicide.")
+
+        return captured_stones

@@ -225,4 +225,3 @@ class Game:
 
         # Place the stone (also checks that the position is free and in bounds)
         self.board.add_move(move)
-        self.moves.append(move)

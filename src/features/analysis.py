@@ -142,6 +142,7 @@ class Analizer:
 
         if selection:
             selected_moves = [{"player": moves_list[turn][0], "moves": selection, "untilDepth": turn + 10}]
+            print(f"Player to move: {moves_list[turn][0]}, Moves: {selection}, UntilDepth: {turn + 10}")
             if invert_selection:
                 json_input["avoidMoves"] = selected_moves
             else:
