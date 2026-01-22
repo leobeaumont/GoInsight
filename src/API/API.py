@@ -89,8 +89,7 @@ class API:
     def deep_turn_area_analysis(
         self,
         turn: int,
-        corner1: Optional[Tuple[int, int]] = None,
-        corner2: Optional[Tuple[int, int]] = None,
+        selection: List[str] = None,
         invert_selection: bool = False,
     ) -> str:
         """
@@ -138,13 +137,6 @@ class API:
         - **possibleVariation** (*list[str]*): A short sequence of moves representing the
           most likely continuation (principal variation) after the suggested move.
         """
-
-        # If an area is selected, get the list of moves contained in it
-        selection: Optional[List[str]] = None
-        if corner1 is not None and corner2 is not None:
-            # Creation of a Game object to have a modelisation of the board
-            game = self.analizer.tree.to_game()
-            selection = game.board.area_selection_positions(corner1, corner2)
 
         # Deep analysis of the turn with the selected move filter
         self.analizer.deep_turn_analysis(
