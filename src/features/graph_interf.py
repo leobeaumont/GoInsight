@@ -2,6 +2,8 @@ import tkinter as tk
 from typing import Tuple, Optional
 import argparse
 import json
+from pathlib import Path
+import os
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -87,7 +89,7 @@ class GoBoardUI:
         self.analyze_btn.place(x=200, y=60) # Adjust x/y as needed
 
         # Analyze all game Button
-        self.analyze_btn = tk.Button(self.master, text="Analyze Game", command=lambda: self.analyze_game(self.selected_area))
+        self.analyze_btn = tk.Button(self.master, text="Analyze Game", command=lambda: self.analyze_game())
         self.analyze_btn.place(x=30, y=100) # Adjust x/y as needed
 
         self.analysis_active = False
@@ -109,6 +111,28 @@ class GoBoardUI:
         self.init_embedded_graph()
 
 
+    def get_temp_sgf_path(self, filename="temp_analysis.sgf"):
+        """
+        Generates a dynamic path to the 'games' folder at the project root.
+        """
+        # 1. Get the path of the current file (API.py or gui.py)
+        current_file = Path(__file__).resolve()
+        
+        # 2. Go up to Project Root. 
+        # If file is in src/features/API.py:
+        # .parent = src/features
+        # .parent.parent = src
+        # .parent.parent.parent = Project_Root
+        project_root = current_file.parent.parent.parent
+        
+        # 3. Define games folder path
+        games_folder = project_root / "games"
+        
+        # 4. Create the folder if it doesn't exist (Safety check)
+        games_folder.mkdir(parents=True, exist_ok=True)
+        
+        # 5. Return the full path including filename
+        return str(games_folder / filename)
 
 
     def init_embedded_graph(self):
@@ -392,6 +416,7 @@ class GoBoardUI:
         """Integrate your analysis feature here."""
 
         # Prepare a Game object reflecting current state
+        sgf_path = self.get_temp_sgf_path("area_analysis.sgf")
         current_rules = self.board_logic.game.ruleset
 
         if isinstance(current_rules, str):
@@ -408,8 +433,8 @@ class GoBoardUI:
         copy_game.moves = self.board_logic.game.moves[:self.view_index]
         print(f"Moves given: {len(copy_game.moves)}")
 
-        sgf_game = copy_game.to_sgftree().to_sgf("/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/games/test1.sgf")
-        api = API(file="/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/games/test1.sgf", player=self.current_turn)
+        sgf_game = copy_game.to_sgftree().to_sgf(sgf_path)
+        api = API(file=sgf_path, player=self.current_turn)
 
         analysis_response = api.deep_turn_area_analysis(
             turn=self.view_index - 1,
@@ -504,6 +529,7 @@ class GoBoardUI:
 
     def analyze_game(self):
 
+        sgf_path = self.get_temp_sgf_path("full_game_analysis.sgf")
         # Prepare a Game object reflecting current state
         current_rules = self.board_logic.game.ruleset
 
@@ -521,8 +547,8 @@ class GoBoardUI:
         copy_game.moves = self.board_logic.game.moves[:]
         print(f"Moves given: {len(copy_game.moves)}")
 
-        sgf_game = copy_game.to_sgftree().to_sgf("/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/games/test1.sgf")
-        api = API(file="/Users/marcelomiranda/Documents/IMT-L2/Commande_entreprise/games/test1.sgf", player=self.current_turn)
+        sgf_game = copy_game.to_sgftree().to_sgf(sgf_path)
+        api = API(file=sgf_path, player=self.current_turn)
 
         analysis_response = api.all_moves_analysis()
         print("Raw API Response:", analysis_response)
@@ -657,10 +683,15 @@ if __name__ == "__main__":
         help="Path to an SGF file to load.",
         default=None # If not provided, it stays None
     )
+
     args = parser.parse_args()
 
+    base_path = Path(__file__).resolve().parent.parent.parent
+    games_dir = base_path / "games"
+
     if args.path:
-        tree_imported = SgfTree.from_sgf(args.path)
+        path_to_game = games_dir / args.path
+        tree_imported = SgfTree.from_sgf(str(path_to_game))
         game = Game.from_sgftree(tree_imported)
         board_logic = Board(game, size=(game.size[0], game.size[1]), moves=game.moves)
         print(board_logic.game.next_color())
