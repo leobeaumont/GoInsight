@@ -1,3 +1,4 @@
+# --- 1. IMPORTS ---
 import tkinter as tk
 from typing import Tuple, Optional
 import argparse
@@ -16,8 +17,9 @@ from src.data.sgf import SgfTree
 from src.features.analysis import Analizer
 from src.API.API import API
 
-# Minimal Mock for Constants
+# --- 2. CONSTANTS ---
 VALID_COLUMN_GTP = "ABCDEFGHJKLMNOPQRST"
+
 
 # --- 3. THE TKINTER GUI CLASS ---
 
@@ -115,17 +117,13 @@ class GoBoardUI:
         """
         Generates a dynamic path to the 'games' folder at the project root.
         """
-        # 1. Get the path of the current file (API.py or gui.py)
+        # 1. Get the path of the current file 
         current_file = Path(__file__).resolve()
         
         # 2. Go up to Project Root. 
-        # If file is in src/features/API.py:
-        # .parent = src/features
-        # .parent.parent = src
-        # .parent.parent.parent = Project_Root
         project_root = current_file.parent.parent.parent
         
-        # 3. Define games folder path
+        # 3. Go to games folder
         games_folder = project_root / "games"
         
         # 4. Create the folder if it doesn't exist (Safety check)
@@ -133,7 +131,6 @@ class GoBoardUI:
         
         # 5. Return the full path including filename
         return str(games_folder / filename)
-
 
     def init_embedded_graph(self):
         """Creates an empty graph below the board with matching width."""
@@ -198,6 +195,8 @@ class GoBoardUI:
         """
         Reconstructs the board state from move 0 up to self.view_index.
         """
+
+        # Get moves to replay
         moves_to_replay = self.board_logic.game.moves[:self.view_index]
 
         self.clear_analysis_markers()
@@ -207,13 +206,13 @@ class GoBoardUI:
         except ValueError as e:
             print(f"History Error: {e}")
 
-        # 3. Redraw the visual stones
+        # Redraw the visual stones
         self.refresh_stones()
 
         if self.analysis_active:
             self.update_classification_label()
         
-        # 4. Optional: Update Title to show move number
+        # Optional: Update Title to show move number
         self.master.title(f"Go - Move {self.view_index} / {len(self.board_logic.game.moves)}")
 
     def draw_grid(self):
@@ -233,6 +232,7 @@ class GoBoardUI:
 
     def draw_star_points(self):
         """Draws hoshi points for 19x19."""
+        # Only draw for 19x19
         if self.board_size != 19: return
         
         # Standard 19x19 star points
@@ -252,9 +252,6 @@ class GoBoardUI:
         """
 
         total_moves = len(self.board_logic.game.moves)
-        if self.view_index != total_moves:
-            print("Cannot play while viewing history! Press <Right> to go to current turn.")
-            return
 
         # 1. Convert coords
         col = round((event.x - self.margin) / self.cell_size)
@@ -262,9 +259,15 @@ class GoBoardUI:
 
         self.canvas.focus_set()
 
+        # Check if we are in selection mode
         if self.selection_mode:
             self.handle_selection_click(col, row)
             return # Skip normal move handling
+        
+        # Cannot play if viewing history
+        if self.view_index != total_moves:
+            print("Cannot play while viewing history! Press <Right> to go to current turn.")
+            return
 
         # 2. Basic Bounds Check (before calling logic)
         if 0 <= col < self.board_size and 0 <= row < self.board_size:
@@ -276,13 +279,13 @@ class GoBoardUI:
 
             try:
                 # 3. Attempt to add move to your logic
-                # This validates the move AND calculates captures (update_board)
+                # This validates the move AND calculates captures 
                 self.board_logic.add_move(move)
                 
-                self.view_index += 1 # We just added a move, so increment index
+                self.view_index += 1 # We increment index
                 self.refresh_stones()
 
-                # 4. Success? Toggle turn and Redraw
+                # 4. If success, switch turn
                 self.current_turn = 'W' if self.current_turn == 'B' else 'B'
                 self.master.title(f"Go - {self.current_turn}'s Turn")
                 self.refresh_stones()
@@ -295,7 +298,7 @@ class GoBoardUI:
         Wipes all stones and redraws them based on self.board_logic.board.
         This ensures captures calculated in Python are reflected in GUI.
         """
-        self.canvas.delete("stone") # Delete items tagged as "stone"
+        self.canvas.delete("stone") # Delete all items tagged as "stone"
 
         # Iterate over your board logic's 2D array
         # self.board_logic.board is List[List[Optional[Move]]]
@@ -325,7 +328,7 @@ class GoBoardUI:
             self.select_btn.config(text="Select Area", relief="raised")
     
     def handle_selection_click(self, col, row):
-        # 1. Store the click
+        # 1. Store the coordinates
         self.selection_clicks.append((col, row))
         print(f"Selected corner: {col}, {row}")
 
@@ -398,10 +401,10 @@ class GoBoardUI:
     
     def toggle_invert_mode(self):
         """Switches the analysis mode between Inside and Outside."""
-        # 1. Flip the boolean
+        # Invert boolean
         self.invert_selection = not self.invert_selection
         
-        # 2. Update the button text based on the new value
+        # Update the button text based on the new value
         if self.invert_selection:
             new_text = "Analysis: Outside Zone"
         else:
@@ -413,7 +416,7 @@ class GoBoardUI:
         print(f"Invert Mode changed to: {self.invert_selection}")
     
     def analyze_area(self, positions):
-        """Integrate your analysis feature here."""
+        """Analyzes position taking into account selected area and invert mode."""
 
         # Prepare a Game object reflecting current state
         sgf_path = self.get_temp_sgf_path("area_analysis.sgf")
@@ -457,7 +460,7 @@ class GoBoardUI:
     
     def display_analysis_results(self, analysis_data: list):
         """
-        Draws semi-transparent blue stones on the best moves.
+        Draws semi-transparent stones on the best moves.
         """
         # 1. Clear old analysis first
         self.clear_analysis_markers()
